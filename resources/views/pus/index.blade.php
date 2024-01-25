@@ -1,0 +1,100 @@
+@extends('layouts.app')
+
+@section('header')
+  @include('pertials.header')
+@endsection
+
+@section('sidebar')
+  @include('pertials.sidebar')
+@endsection
+
+@section('content')
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Dashboard</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item active">Ratechs</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="row">
+
+          <!-- States List -->
+          <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+
+              <div class="card-body">
+                <h5 class="card-title">Recent PUs</h5>
+
+                <table class="table table-borderless datatable">
+                  <thead>
+                    <tr>
+                      <th >S/N &nbsp; &nbsp;</th>
+                      <th scope="col">Number &nbsp; &nbsp;</th>
+                      <th scope="col">Name &nbsp; &nbsp;</th>
+                      <th scope="col">State &nbsp; &nbsp;</th>
+                      <th scope="col">Zone &nbsp; &nbsp;</th>
+                      <th scope="col">LGA &nbsp; &nbsp;</th>
+                      <th scope="col">Ward &nbsp; &nbsp;</th>
+                      <th scope="col">Voters &nbsp; &nbsp;</th>
+                      <th scope="col">Actions &nbsp; &nbsp;</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach($pus as $pu)
+                      <tr>
+                        <td>{{ $sn++ }}</td>
+                        <td>{{ $pu->number }}</td>
+                        <td>{{ $pu->name }}</td>
+                        <td>{{ $pu->state->name }}</td>
+                        <td>{{ $pu->zone->name }}</td>
+                        <td>{{ $pu->lga->name }}</td>
+                        <td>{{ $pu->ward->name }}</td>
+                        <td>{{ count($pu->users) }}</td>
+                        <td scope="row" style="display: flex; align-content: flex-start; justify-content: space-between;">
+                          <a href="/admin/pus/{{ $pu->id }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-binoculars"></i> View</a>
+                          <a href="/admin/pus/{{ $pu->id }}/edit" class="btn btn-sm btn-success"><i class="bi bi-pencil-square"></i> Edit</a>
+                          <form method="POST" action="/admin/pus/{{ $pu->id }}" class="form-horizontal">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i>Delete</button>
+                          </form>
+                        </td>
+                      </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+
+                <div class="row">
+                  <div class="col-md-9">
+                    {{$pus->links()}}
+                  </div>
+
+                  <div class="col-md-3">
+                    <a href="/admin/pus/create" class="btn btn-primary">Add PU</a>
+                  </div>
+                </div>
+            
+              </div>
+
+            </div>
+          </div><!-- End States List -->
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+@endsection
+
+@section('footer')
+  @include('pertials.footer')
+@endsection
+
+@section('toast')
+  @include('pertials.toast')
+@endsection
