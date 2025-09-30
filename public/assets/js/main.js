@@ -313,7 +313,7 @@
    */
 
   const countDown = () => {
-    const countDate = new Date("November 11, 2023 08:00:00").getTime();
+    const countDate = new Date("February 23, 2027 08:00:00").getTime();
     const now = new Date().getTime();
     const gap = countDate - now;
 
