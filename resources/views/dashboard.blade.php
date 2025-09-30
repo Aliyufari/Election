@@ -31,7 +31,7 @@
           <div class="col-xxl-4 col-md-12">
             <div class="card info-card p-3">
 
-              <h3 class="card-title text-center">2023 Bayelsa State Governotorial Election</h3>              
+              <h3 class="card-title text-center">2027 Nigerian National General Election</h3>              
 
               <div class="card-body d-flex align-items-center justify-content-around">
                 
