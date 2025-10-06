@@ -22,215 +22,115 @@
 
   <section class="section dashboard">
     <div class="row">
-
       <!-- Left side columns -->
       <div class="col-lg-12">
         <div class="row">
 
-          <!-- States Card -->
-          <div class="col-xxl-4 col-md-12">
-            <div class="card info-card p-3">
-
-              <h3 class="card-title text-center">2027 Nigerian National General Election</h3>              
-
-              <div class="card-body d-flex align-items-center justify-content-around">
-                
-                <div class="d-flex flex-column align-items-center">
-                  <div class="">
-                    <h6 class="day">00</h6>
-                  </div>
-                   <h5 class="card-title">Days</h5>
+          <!-- Election Countdown Card - Full Width -->
+          <div class="col-12 mb-4">
+            <div class="card info-card border-0 shadow-sm p-3">
+              <h5 class="card-title text-center mb-2 text-dark fw-bold" style="font-size: 1.5rem; line-height: 1.3;">
+                2027 Nigerian National General Election
+              </h5>              
+              <div class="card-body d-flex align-items-center justify-content-around p-0 flex-wrap">
+                <div class="d-flex flex-column align-items-center mx-2 my-2">
+                  <h3 class="day fw-bold card-title count-number">00</h3>
+                  <span class="count-label text-dark">Days</span>
                 </div>
-
-                <div class="d-flex flex-column align-items-center">
-                  <div class="">
-                    <h6 class="hour">00</h6>
-                  </div>
-                   <h5 class="card-title">Hours</h5>
+                <div class="d-flex flex-column align-items-center mx-2 my-2">
+                  <h3 class="hour fw-bold card-title count-number">00</h3>
+                  <span class="count-label text-dark">Hours</span>
                 </div>
-
-                <div class="d-flex flex-column align-items-center">
-                  <div class="">
-                    <h6 class="minute">00</h6>
-                  </div>
-                   <h5 class="card-title">Minutes</h5>
+                <div class="d-flex flex-column align-items-center mx-2 my-2">
+                  <h3 class="minute fw-bold card-title count-number">00</h3>
+                  <span class="count-label text-dark">Minutes</span>
                 </div>
-
-                <div class="d-flex flex-column align-items-center">
-                  <div class="">
-                    <h6 class="second">00</h6>
-                  </div>
-                   <h5 class="card-title">Secons</h5>
+                <div class="d-flex flex-column align-items-center mx-2 my-2">
+                  <h3 class="second fw-bold card-title count-number">00</h3>
+                  <span class="count-label text-dark">Seconds</span>
                 </div>
-              </div > 
+              </div> 
             </div>
-          </div><!-- -->
+          </div><!-- End Election Countdown Card -->
 
           <!-- States Card -->
-          <div class="col-xxl-4 col-md-6">
-            <div class="card info-card sales-card">
-
-              <div class="filter">
-                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                  <li class="dropdown-header text-start">
-                    <h6>Filter</h6>
-                  </li>
-
-                  <li><a class="dropdown-item" href="#">Today</a></li>
-                  <li><a class="dropdown-item" href="#">This Month</a></li>
-                  <li><a class="dropdown-item" href="#">This Year</a></li>
-                </ul>
-              </div>
-
-              <div class="card-body">
-                <h5 class="card-title">States <span>| Today</span></h5>
-
-                <div class="d-flex align-items-center">
-                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                    <i class="bi bi-house"></i>
-                  </div>
-                  <div class="ps-3">
-                    <h6>36</h6>
-                    <span class="text-primary small pt-1 fw-bold">100%</span> <span class="text-muted small pt-2 ps-1">complete</span>
-
-                  </div>
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card info-card sales-card border-0 shadow-sm h-100">
+              <div class="card-body d-flex align-items-center p-3">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: rgba(65, 84, 241, 0.1);">
+                  <i class="bi bi-house text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="card-title mb-1 small" style="font-size: 1rem;">States</h6>
+                  <h4 class="fw-bold mb-0" style="font-size: 1.4rem;">36</h4>
                 </div>
               </div>
-
             </div>
-          </div><!-- -->
+          </div><!-- End States Card -->
 
-          <!-- Revenue Card -->
-          <div class="col-xxl-4 col-md-6">
-            <div class="card info-card revenue-card">
-
-              <div class="filter">
-                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                  <li class="dropdown-header text-start">
-                    <h6>Filter</h6>
-                  </li>
-
-                  <li><a class="dropdown-item" href="#">Today</a></li>
-                  <li><a class="dropdown-item" href="#">This Month</a></li>
-                  <li><a class="dropdown-item" href="#">This Year</a></li>
-                </ul>
-              </div>
-
-              <div class="card-body">
-                <h5 class="card-title">LGAs <span>| This Month</span></h5>
-
-                <div class="d-flex align-items-center">
-                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                    <i class="bi bi-shop"></i>
-                  </div>
-                  <div class="ps-3">
-                    <h6>774</h6>
-                    <span class="text-success small pt-1 fw-bold">100%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
-                  </div>
+          <!-- Zones Card -->
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card info-card sales-card border-0 shadow-sm h-100">
+              <div class="card-body d-flex align-items-center p-3">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: rgba(101, 31, 255, 0.1);">
+                  <i class="bi bi-geo-alt text-purple" style="font-size: 1.5rem;"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="card-title mb-1 small" style="font-size: 1rem;">Zones</h6>
+                  <h4 class="fw-bold mb-0" style="font-size: 1.4rem;">36</h4>
                 </div>
               </div>
-
             </div>
-          </div><!-- End Revenue Card -->
+          </div><!-- End Zones Card -->
 
-          <!-- Customers Card -->
-          <div class="col-xxl-4 col-xl-6">
-
-            <div class="card info-card customers-card">
-
-              <div class="filter">
-                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                  <li class="dropdown-header text-start">
-                    <h6>Filter</h6>
-                  </li>
-
-                  <li><a class="dropdown-item" href="#">Today</a></li>
-                  <li><a class="dropdown-item" href="#">This Month</a></li>
-                  <li><a class="dropdown-item" href="#">This Year</a></li>
-                </ul>
-              </div>
-
-              <div class="card-body">
-                <h5 class="card-title">Supervisors <span>| This Year</span></h5>
-
-                <div class="d-flex align-items-center">
-                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                    <i class="bi bi-people"></i>
-                  </div>
-                  <div class="ps-3">
-                    <h6>1244</h6>
-                    <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
-
-                  </div>
+          <!-- LGAs Card -->
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card info-card revenue-card border-0 shadow-sm h-100">
+              <div class="card-body d-flex align-items-center p-3">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: rgba(46, 202, 106, 0.1);">
+                  <i class="bi bi-shop text-success" style="font-size: 1.5rem;"></i>
                 </div>
-
-              </div>
-            </div>
-
-          </div><!-- End Customers Card -->
-
-          <!-- States Card -->
-          <div class="col-xxl-4 col-md-6">
-            <div class="card info-card sales-card">
-
-              <div class="filter">
-                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                  <li class="dropdown-header text-start">
-                    <h6>Filter</h6>
-                  </li>
-
-                  <li><a class="dropdown-item" href="#">Today</a></li>
-                  <li><a class="dropdown-item" href="#">This Month</a></li>
-                  <li><a class="dropdown-item" href="#">This Year</a></li>
-                </ul>
-              </div>
-
-              <div class="card-body">
-                <h5 class="card-title">Zones <span>| Today</span></h5>
-
-                <div class="d-flex align-items-center">
-                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                    <i class="bi bi-person-fill"></i>
-                  </div>
-                  <div class="ps-3">
-                    <h6>36</h6>
-                    <span class="text-primary small pt-1 fw-bold">100%</span> <span class="text-muted small pt-2 ps-1">complete</span>
-
-                  </div>
+                <div class="flex-grow-1">
+                  <h6 class="card-title mb-1 small" style="font-size: 1rem;">LGAs</h6>
+                  <h4 class="fw-bold mb-0" style="font-size: 1.4rem;">774</h4>
                 </div>
               </div>
-
             </div>
-          </div><!-- -->
+          </div><!-- End LGAs Card -->
+
+          <!-- Supervisors Card -->
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card info-card customers-card border-0 shadow-sm h-100">
+              <div class="card-body d-flex align-items-center p-3">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: rgba(255, 119, 29, 0.1);">
+                  <i class="bi bi-person-circle text-warning" style="font-size: 1.5rem;"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="card-title mb-1 small" style="font-size: 1rem;">Supervisors</h6>
+                  <h4 class="fw-bold mb-0" style="font-size: 1.4rem;">1,244</h4>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Supervisors Card -->
 
           <!-- Reports -->
           <div class="col-12">
-            <div class="card">
-
+            <div class="card border-0 shadow-sm">
               <div class="filter">
                 <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                   <li class="dropdown-header text-start">
                     <h6>Filter</h6>
                   </li>
-
                   <li><a class="dropdown-item" href="#">Today</a></li>
                   <li><a class="dropdown-item" href="#">This Month</a></li>
                   <li><a class="dropdown-item" href="#">This Year</a></li>
                 </ul>
               </div>
-
               <div class="card-body">
-                <h5 class="card-title">Accreditation Report Analysis <span>/Today</span></h5>
-
+                <h5 class="card-title">Accreditation Report Analysis</h5>
                 <!-- Line Chart -->
                 <div id="reportsChart"></div>
-
                 <script>
                   document.addEventListener("DOMContentLoaded", () => {
                     new ApexCharts(document.querySelector("#reportsChart"), {
@@ -284,18 +184,68 @@
                   });
                 </script>
                 <!-- End Line Chart -->
-
               </div>
-
             </div>
           </div><!-- End Reports -->
 
         </div>
       </div><!-- End Left side columns -->
-
     </div>
   </section>
 </main><!-- End #main -->
+
+<style>
+.text-purple {
+  color: #6f42c1 !important;
+}
+.card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+.count-number {
+  font-size: 1.8rem;
+  min-width: 60px;
+  text-align: center;
+}
+.count-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .count-number {
+    font-size: 1.5rem;
+    min-width: 50px;
+  }
+  .count-label {
+    font-size: 0.8rem;
+  }
+  .card-title {
+    font-size: 1.2rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .count-number {
+    font-size: 1.3rem;
+    min-width: 45px;
+  }
+  .count-label {
+    font-size: 0.75rem;
+  }
+  .card-body {
+    justify-content: center !important;
+  }
+  .mx-2 {
+    margin-left: 0.5rem !important;
+    margin-right: 0.5rem !important;
+  }
+}
+</style>
 @endsection
 
 @section('footer')
@@ -305,4 +255,3 @@
 @section('toast')
   @include('pertials.toast')
 @endsection
-

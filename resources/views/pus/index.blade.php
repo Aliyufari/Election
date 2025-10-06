@@ -12,11 +12,11 @@
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Dashboard</h1>
+      <h1>Polling Units Management</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item active">Ratechs</li>
+          <li class="breadcrumb-item active">Polling Units</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -24,71 +24,111 @@
     <section class="section dashboard">
       <div class="row">
 
-          <!-- States List -->
+          <!-- PUs List -->
           <div class="col-12">
-            <div class="card recent-sales overflow-auto">
+            <div class="card recent-sales overflow-auto border-0 shadow-sm">
 
-              <div class="card-body">
-                <h5 class="card-title">Recent PUs</h5>
+              <div class="card-header bg-transparent border-0 pt-3 pb-0">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="card-title mb-0 text-dark fw-bold">Polling Units List</h5>
+                  <a href="/admin/pus/create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Add New PU
+                  </a>
+                </div>
+                <p class="text-muted mt-2 mb-0">Manage all Polling Units in the system</p>
+              </div>
 
-                <table class="table table-borderless datatable">
-                  <thead>
-                    <tr>
-                      <th >S/N &nbsp; &nbsp;</th>
-                      <th scope="col">Number &nbsp; &nbsp;</th>
-                      <th scope="col">Name &nbsp; &nbsp;</th>
-                      <th scope="col">State &nbsp; &nbsp;</th>
-                      <th scope="col">Zone &nbsp; &nbsp;</th>
-                      <th scope="col">LGA &nbsp; &nbsp;</th>
-                      <th scope="col">Ward &nbsp; &nbsp;</th>
-                      <th scope="col">Voters &nbsp; &nbsp;</th>
-                      <th scope="col">Actions &nbsp; &nbsp;</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @foreach($pus as $pu)
+              <div class="card-body pt-3">
+                <div class="table-responsive">
+                  <table class="table table-hover table-borderless">
+                    <thead class="table-light">
                       <tr>
-                        <td>{{ $sn++ }}</td>
-                        <td>{{ $pu->number }}</td>
-                        <td>{{ $pu->name }}</td>
-                        <td>{{ $pu->state->name }}</td>
-                        <td>{{ $pu->zone->name }}</td>
-                        <td>{{ $pu->lga->name }}</td>
-                        <td>{{ $pu->ward->name }}</td>
-                        <td>{{ count($pu->users) }}</td>
-                        <td scope="row" style="display: flex; align-content: flex-start; justify-content: space-between;">
-                          <a href="/admin/pus/{{ $pu->id }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-binoculars"></i> View</a>
-                          <a href="/admin/pus/{{ $pu->id }}/edit" class="btn btn-sm btn-success"><i class="bi bi-pencil-square"></i> Edit</a>
-                          <form method="POST" action="/admin/pus/{{ $pu->id }}" class="form-horizontal">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i>Delete</button>
-                          </form>
-                        </td>
+                        <th class="ps-3">S/N</th>
+                        <th>Number</th>
+                        <th>Name</th>
+                        <th>State</th>
+                        <th>Zone</th>
+                        <th>LGA</th>
+                        <th>Ward</th>
+                        <th>Voters</th>
+                        <th class="text-center pe-3">Actions</th>
                       </tr>
-                    @endforeach
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      @foreach($pus as $pu)
+                        <tr class="border-bottom">
+                          <td class="ps-3 fw-medium">{{ $sn++ }}</td>
+                          <td class="fw-semibold text-primary">{{ $pu->number }}</td>
+                          <td class="fw-semibold text-dark">{{ $pu->name }}</td>
+                          <td>
+                            <span class="badge bg-secondary rounded-pill">{{ $pu->state->name }}</span>
+                          </td>
+                          <td>
+                            <span class="badge bg-primary rounded-pill">{{ $pu->zone->name }}</span>
+                          </td>
+                          <td>
+                            <span class="badge bg-success rounded-pill">{{ $pu->lga->name }}</span>
+                          </td>
+                          <td>
+                            <span class="badge bg-info rounded-pill">{{ $pu->ward->name }}</span>
+                          </td>
+                          <td>
+                            <span class="badge bg-danger rounded-pill">{{ count($pu->users) }}</span>
+                          </td>
+                          <td class="text-center pe-3">
+                            <div class="btn-group" role="group">
+                              <a href="/admin/pus/{{ $pu->id }}" class="btn btn-sm btn-outline-primary" title="View">
+                                <i class="bi bi-eye"></i>
+                              </a>
+                              <a href="/admin/pus/{{ $pu->id }}/edit" class="btn btn-sm btn-outline-success" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                              </a>
+                              <form method="POST" action="/admin/pus/{{ $pu->id }}" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this polling unit?')">
+                                  <i class="bi bi-trash"></i>
+                                </button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+                </div>
 
-                <div class="row">
-                  <div class="col-md-9">
-                    {{$pus->links()}}
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                  <div class="text-muted small">
+                    Showing {{ $pus->firstItem() ?? 0 }} to {{ $pus->lastItem() ?? 0 }} of {{ $pus->total() }} entries
                   </div>
-
-                  <div class="col-md-3">
-                    <a href="/admin/pus/create" class="btn btn-primary">Add PU</a>
+                  <div>
+                    {{ $pus->links() }}
                   </div>
                 </div>
             
               </div>
 
             </div>
-          </div><!-- End States List -->
+          </div><!-- End PUs List -->
 
       </div>
     </section>
 
   </main><!-- End #main -->
+
+  <style>
+    .table > :not(caption) > * > * {
+      padding: 0.75rem 0.5rem;
+    }
+    .btn-group .btn {
+      margin: 0 2px;
+    }
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+  </style>
 @endsection
 
 @section('footer')

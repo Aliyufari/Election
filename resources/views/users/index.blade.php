@@ -12,11 +12,11 @@
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Users</h1>
+      <h1>Users Management</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item active">Manage Users</li>
+          <li class="breadcrumb-item active">Users</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -26,79 +26,98 @@
 
           <!-- Users List -->
           <div class="col-12">
-            <div class="card recent-sales overflow-auto">
+            <div class="card recent-sales overflow-auto border-0 shadow-sm">
 
-              
+              <div class="card-header bg-transparent border-0 pt-3 pb-0">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="card-title mb-0 text-dark fw-bold">Users List</h5>
+                  <a href="/admin/users/create" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-1"></i>Create User
+                  </a>
+                </div>
+                <p class="text-muted mt-2 mb-0">Manage all users in the system</p>
+              </div>
 
-              <div class="card-body">
-                <h5 class="card-title">Recent Users</h5>
-
-                <table class="table table-borderless datatable">
-                  <thead>
-                    <tr>
-                      <th >S/N &nbsp; &nbsp;</th>
-                      <th scope="col">Name &nbsp; &nbsp;</th>
-                      <th scope="col">Username &nbsp; &nbsp;</th>
-                      <th scope="col">Email &nbsp; &nbsp;</th>
-                      <th scope="col">Gender &nbsp; &nbsp;</th>
-                      <th scope="col">Image &nbsp; &nbsp;</th>
-                      <th scope="col">Role &nbsp; &nbsp;</th>
-                      <th scope="col">Actions &nbsp; &nbsp;</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  @foreach($users as $user)
-                    @if( strtolower($user->role) !== 'super')
+              <div class="card-body pt-3">
+                <div class="table-responsive">
+                  <table class="table table-hover table-borderless">
+                    <thead class="table-light">
                       <tr>
-                        <td>{{ $sn++ }}</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->username }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ $user->gender }}</td>
-                        <th scope="row">
-                          <a href="/admin/users/{{ $user->id }}">
-                            <img src="{{$user->image ? asset('storage/' . $user->image) : asset('assets/img/users/user.jpg')}}" style="max-width:40px; max-height:40px;" alt="" title="View User">
-                          </a>
-                        </th>
-                        <td>
-                          <span class="badge 
-                            @if( strtolower($user->role) === 'user')
-                              bg-warning
-                            @elseif( strtolower($user->role) === 'admin')
-                               @php echo 'bg-success' @endphp
-                            @elseif( strtolower($user->role) === 'ratech')
-                               @php echo 'bg-primary' @endphp
-                            @else
-                              @php echo 'bg-info' @endphp
-                            @endif  
-                          ">
-                            {{ $user->role }}
-                          </span>
-                        </td>
-                        <td scope="row" style="display: flex; align-content: flex-start; justify-content: space-between;">
-                          <a href="/admin/users/{{ $user->id }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-binoculars"></i> View</a>
-                          <a href="/admin/users/{{ $user->id }}/edit" class="btn btn-sm btn-success"><i class="bi bi-pencil-square"></i> Edit</a>
-                          <form method="POST" action="/admin/users/{{ $user->id }}" class="form-horizontal">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i>Delete</button>
-                          </form>
-                        </td>
+                        <th class="ps-3">#</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Gender</th>
+                        <th>Image</th>
+                        <th>Role</th>
+                        <th class="text-center pe-3">Actions</th>
                       </tr>
-                    @endif 
-                  @endforeach
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                    @foreach($users as $user)
+                      @if(strtolower($user->role) !== 'super')
+                        <tr class="border-bottom">
+                          <td class="ps-3 fw-medium">{{ $sn++ }}</td>
+                          <td class="fw-semibold text-dark">{{ $user->name }}</td>
+                          <td>{{ $user->username }}</td>
+                          <td>{{ $user->email }}</td>
+                          <td>
+                            <span class="badge bg-secondary rounded-pill">{{ $user->gender }}</span>
+                          </td>
+                          <td>
+                            <a href="/admin/users/{{ $user->id }}">
+                              <img src="{{ $user->image ? asset('storage/' . $user->image) : asset('assets/img/users/user.jpg') }}" 
+                                   style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;" 
+                                   alt="{{ $user->name }}" 
+                                   title="View {{ $user->name }}">
+                            </a>
+                          </td>
+                          <td>
+                            <span class="badge 
+                              @if(strtolower($user->role) === 'user')
+                                bg-warning
+                              @elseif(strtolower($user->role) === 'admin')
+                                bg-success
+                              @elseif(strtolower($user->role) === 'ratech')
+                                bg-primary
+                              @else
+                                bg-info
+                              @endif  
+                            rounded-pill">
+                              {{ $user->role }}
+                            </span>
+                          </td>
+                          <td class="text-center pe-3">
+                            <div class="btn-group" role="group">
+                              <a href="/admin/users/{{ $user->id }}" class="btn btn-sm btn-outline-primary" title="View">
+                                <i class="bi bi-eye"></i>
+                              </a>
+                              <a href="/admin/users/{{ $user->id }}/edit" class="btn btn-sm btn-outline-success" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                              </a>
+                              <form method="POST" action="/admin/users/{{ $user->id }}" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this user?')">
+                                  <i class="bi bi-trash"></i>
+                                </button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                      @endif 
+                    @endforeach
+                    </tbody>
+                  </table>
+                </div>
 
-                <div class="row">
-                  <div class="col-md-9">
-                    {{$users->links()}}
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                  <div class="text-muted small">
+                    Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }} entries
                   </div>
-
-                  <div class="col-md-3">
-                    <a href="/admin/users/create" class="btn btn-primary">
-                      <i class="bi bi-person-plus"></i> Create User
-                    </a>
+                  <div>
+                    {{ $users->links() }}
                   </div>
                 </div>
             
@@ -111,6 +130,18 @@
     </section>
 
   </main><!-- End #main -->
+
+  <style>
+    .table > :not(caption) > * > * {
+      padding: 0.75rem 0.5rem;
+    }
+    .btn-group .btn {
+      margin: 0 2px;
+    }
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+  </style>
 @endsection
 
 @section('footer')
@@ -120,4 +151,3 @@
 @section('toast')
   @include('pertials.toast')
 @endsection
-  

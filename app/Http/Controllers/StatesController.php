@@ -14,43 +14,41 @@ use DB;
 
 class StatesController extends Controller
 {
-     public function __construct()
+    public function __construct()
     {
         $this->middleware('auth');
     }
-    
-     public function index(State $state)
+
+    public function index(State $state)
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
+        } else {
             return view('states.index', [
-                'states' => $state->latest()->paginate(10),
+                'states' => $state->paginate(10),
                 'zones' => Zone::latest()->get(),
                 'lgas' => Lga::latest()->get(),
                 'wards' => Ward::latest()->get(),
                 'pus' => Pu::latest()->get(),
                 'sn' => 1,
             ]);
-        }   
+        }
     }
 
     public function show(State $state)
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
-           return view('states.show', [
+        } else {
+            return view('states.show', [
                 'state' => $state,
                 'states' => State::latest()->get(),
                 'zones' => Zone::latest()->get(),
                 'lgas' => Lga::latest()->get(),
                 'wards' => Ward::latest()->get(),
                 'pus' => Pu::latest()->get(),
-           ]);
-        }   
+            ]);
+        }
     }
 
     public function info(State $state)
@@ -65,7 +63,7 @@ class StatesController extends Controller
             'Councillor'
         ];
 
-       return view('states.info', [
+        return view('states.info', [
             'election_list' => $elections,
             'state' => $state,
             'states' => State::latest()->get(),
@@ -75,12 +73,12 @@ class StatesController extends Controller
             'lgas' => Lga::latest()->get(),
             'wards' => Ward::latest()->get(),
             'pus' => Pu::latest()->get(),
-       ]);   
+        ]);
     }
 
     public function zones(State $state)
-    { 
-       return view('states.zones', [
+    {
+        return view('states.zones', [
             'election' => request('name'),
             'elections' => Election::latest()->get(),
             'states' => State::latest()->get(),
@@ -89,16 +87,15 @@ class StatesController extends Controller
             'zone_lgas' => DB::table('lgas')->where('state', 'Bauchi'),
             'lgas' => Lga::latest()->get(),
             'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(), 
-       ]);   
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function create()
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
+        } else {
             return view('states.create', [
                 'states' => State::latest()->get(),
                 'zones' => Zone::latest()->get(),
@@ -106,7 +103,7 @@ class StatesController extends Controller
                 'wards' => Ward::latest()->get(),
                 'pus' => Pu::latest()->get(),
             ]);
-        }  
+        }
     }
 
     public function store(Request $request)
@@ -125,17 +122,16 @@ class StatesController extends Controller
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
-           return view('states.edit', [
+        } else {
+            return view('states.edit', [
                 'state' => $state,
                 'states' => State::latest()->get(),
                 'zones' => Zone::latest()->get(),
                 'lgas' => Lga::latest()->get(),
                 'wards' => Ward::latest()->get(),
                 'pus' => Pu::latest()->get(),
-           ]); 
-        } 
+            ]);
+        }
     }
 
     public function update(Request $request, State $state)
