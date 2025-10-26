@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ElectionsController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CvrController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\StatesController;
 use App\Http\Controllers\ZonesController;
@@ -82,6 +83,7 @@ Route::delete('/admin/states/{state}', [StatesController::class, 'destroy']);
 Route::get('/states/{state}/info', [StatesController::class, 'info']);
 // Route::get('/states/{zone}/info', [StatesController::class, 'info']);
 Route::get('/states/{state}/zones', [StatesController::class, 'zones']);
+Route::get('/admin/list', [StatesController::class, 'list']);
 Route::get('/admin/states', [StatesController::class, 'index']);
 
 //Zone
@@ -156,3 +158,6 @@ Route::put('/admin/results/{result}', [ResultsController::class, 'update']);
 Route::delete('/admin/results/{result}', [ResultsController::class, 'destroy']);
 Route::get('/admin/results', [ResultsController::class, 'index']);
 Route::get('/results/{result}', [ResultsController::class, 'show']);
+
+Route::get('/admin/cvr/voters', [CvrController::class, 'voters']);
+Route::get('/admin/cvr/logins', [CvrController::class, 'logins']);

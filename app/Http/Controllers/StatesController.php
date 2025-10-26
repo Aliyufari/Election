@@ -35,6 +35,22 @@ class StatesController extends Controller
         }
     }
 
+    public function list(State $state)
+    {
+        if (strtolower(auth()->user()->role) !== 'admin') {
+            return abort('404');
+        } else {
+            return view('states.list', [
+                'states' => $state->paginate(10),
+                'zones' => Zone::latest()->get(),
+                'lgas' => Lga::latest()->get(),
+                'wards' => Ward::latest()->get(),
+                'pus' => Pu::latest()->get(),
+                'sn' => 1,
+            ]);
+        }
+    }
+
     public function show(State $state)
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
