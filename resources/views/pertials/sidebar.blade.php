@@ -87,7 +87,7 @@
       </li><!-- End Users Nav -->
 
       <li class="nav-item">
-        <a class="nav-link {{ request()->is('admin/results*') ? 'active' : 'collapsed' }}" href="/admin/results">
+        <a class="nav-link " href="">
           <i class="bi bi-check"></i>
           <span>Parties</span>
         </a>
