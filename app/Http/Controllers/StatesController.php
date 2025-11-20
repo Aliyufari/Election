@@ -54,17 +54,31 @@ class StatesController extends Controller
     public function show(State $state)
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        } else {
-            return view('states.show', [
+            abort(404);
+        }
+
+        $state->load(['lgas', 'users', 'wards', 'pus', 'zones']);
+
+        if (request()->wantsJson()) {
+            // dd($state);
+            return response()->json([
                 'state' => $state,
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
+                // 'lgas'  => $state->lgas,
+                // 'users' => $state->users,
+                // 'wards' => $state->wards,
+                // 'pus'   => $state->pus,
+                // 'zones' => $state->zones,
             ]);
         }
+
+        return view('states.show', [
+            'state' => $state,
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function info(State $state)

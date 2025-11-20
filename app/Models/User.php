@@ -30,6 +30,7 @@ class User extends Authenticatable
         'country',
         'address',
         'role',
+        'role_id',
         'state_id',
         'zone_id',
         'lga_id',
@@ -61,6 +62,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
 
     public function messages()
     {

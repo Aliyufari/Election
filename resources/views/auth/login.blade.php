@@ -90,5 +90,5 @@
 @endsection('content')
 
 @section('toast')
-  @include('pertials.toast')
+  @include('partials.toast')
 @endsection

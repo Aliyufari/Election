@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
 @section('header')
-  @include('pertials.header')
+  @include('partials.header')
 @endsection
 
 @section('sidebar')
-  @include('pertials.sidebar')
+  @include('partials.sidebar')
 @endsection
 
 @section('content')
@@ -71,9 +71,9 @@
 @endsection
 
 @section('footer')
-  @include('pertials.footer')
+  @include('partials.footer')
 @endsection
 
 @section('toast')
-  @include('pertials.toast')
+  @include('partials.toast')
 @endsection

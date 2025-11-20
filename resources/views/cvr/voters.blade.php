@@ -1,102 +1,172 @@
 @extends('layouts.app')
 
 @section('header')
-  @include('pertials.header')
+  @include('partials.header')
 @endsection
 
 @section('sidebar')
-  @include('pertials.sidebar')
+  @include('partials.sidebar')
 @endsection
 
 @section('content')
 <main id="main" class="main">
 
-    <div class="pagetitle">
-      <h1>CVR Panel</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item">CVR Panel</li>
-          <li class="breadcrumb-item active">Total registered Voters</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
+    <div class="pagetitle mb-4">
+        <h1 class="fw-bold">CVR Panel</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item">CVR Panel</li>
+                <li class="breadcrumb-item active">Total Registered Voters</li>
+            </ol>
+        </nav>
+    </div>
+
     <section class="section dashboard">
-      <div class="row">
-        
-        <!-- Messages-->
+        <div class="row">
             <div class="col-12">
-              <div class="card top-messages overflow-auto">
+                <div class="card shadow-sm">
+                    <div class="card-body">
 
-                <div class="card-body pb-0">
-                  <h5 class="card-title">Total Registered Voters</h5>
-                  <hr>
+                        {{-- Header Section --}}
+                        <h5 class="card-title fw-bold mb-3">Total Registered Voters</h5>
 
-                  <div class="fw-bold text-primary mb-3">
-                    <i class="bi bi-search"></i>
-                    <a>2019 Total Registered Voters: 21 143 501</a>
-                  </div>
+                        {{-- Voter Count Cards --}}
+                        <div class="row g-3 mb-4 align-items-start justify-content-between">
+                            <div class="col-md-9">
+                                <div class="row g-3">
 
-                  <div class="fw-bold text-primary mb-3">
-                    <i class="bi bi-search"></i>
-                    <a>2023 Total Registered Voters: 25 236 967</a>
-                  </div>
+                                    <!-- 2019 Card -->
+                                    <div class="col-md-4">
+                                        <div class="p-3 rounded shadow bg-white d-flex align-items-center">
+                                            <i class="bi bi-person-badge text-primary fs-1 me-3"></i>
+                                            <div>
+                                                <div class="fw-bold fs-5 text-dark">21,143,501</div>
+                                                <small class="text-muted">2019 Registered</small>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                  <div class="fw-bold text-primary mb-3">
-                    <i class="bi bi-search"></i>
-                    <a>Difference Between 2019 and 2023: 1 587 018</a>
-                  </div>
+                                    <!-- 2023 Card -->
+                                    <div class="col-md-4">
+                                        <div class="p-3 rounded shadow bg-white d-flex align-items-center">
+                                            <i class="bi bi-person-badge text-primary fs-1 me-3"></i>
+                                            <div>
+                                                <div class="fw-bold fs-5 text-dark">25,236,967</div>
+                                                <small class="text-muted">2023 Registered</small>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                  <h5 class="card-title mb-0 text-dark fw-bold">2026 CVR Update</h5>
-                  <table class="table table-borderless">
-                    <thead>
-                      <tr>
-                        {{-- <th scope="col">S/N</th> --}}
-                        <th scope="col">PUs</th>
-                        <th scope="col">Ward</th>
-                        <th scope="col">LGAs</th>
-                        <th scope="col">Zones</th>
-                        <th scope="col">States</th>
-                        {{-- <th scope="col">Actions</th> --}}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        {{-- <td class="ps-3 fw-medium">{{ $sn }}</td> --}}
-                        <td class="badge bg-danger rounded-pill">{{ 7456 }}</td>
-                        <td>
-                          <span class="badge bg-primary rounded-pill">{{ 541 }}</span>
-                        </td>
-                        <td>
-                          <span class="badge bg-success rounded-pill">{{ 321 }}</span>
-                        </td>
-                        <td>
-                          <span class="badge bg-info rounded-pill">{{ 288 }}</span>
-                        </td>
-                        <td>
-                          <span class="badge bg-warning rounded-pill">{{ 19 }}</span>
-                        </td>
-                        {{-- <td class="text-center pe-3">
-                          
-                        </td> --}}
-                      </tr>
-                    </tbody>
-                  </table>
-                  <hr>
-                </div>
+                                    <!-- Difference Card -->
+                                    <div class="col-md-4">
+                                        <div class="p-3 rounded shadow bg-white d-flex align-items-center">
+                                            <i class="bi bi-graph-up-arrow text-success fs-1 me-3"></i>
+                                            <div>
+                                                <div class="fw-bold fs-5 text-dark">1,587,018</div>
+                                                <small class="text-muted">Difference</small>
+                                            </div>
+                                        </div>
+                                    </div>
 
-              </div>
-            </div><!-- End Top Messages -->
-      </div>
+                                </div>
+                            </div>
+
+                            <!-- Update Button -->
+                            <div class="col-md-auto d-flex align-items-start">
+                                <button type="button" class="btn btn-success">
+                                    <i class="bi bi-arrow-repeat me-1"></i> Update
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- Filter Section --}}
+                        <h5 class="fw-bold text-dark mb-3">2026 CVR Update</h5>
+                        <div class="row g-3 mb-4 align-items-end justify-content-between">
+
+                            <div class="col-md-9">
+                                <div class="row g-3">
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">State</label>
+                                        <select class="form-select">
+                                            <option selected>Select State</option>
+                                            <option>Bauchi</option>
+                                            <option>Gombe</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Zone</label>
+                                        <select class="form-select">
+                                            <option selected>Select Zone</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">LGA</label>
+                                        <select class="form-select">
+                                            <option selected>Select LGA</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Ward</label>
+                                        <select class="form-select">
+                                            <option selected>Select Ward</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Add CVR Button -->
+                            <div class="col-md-auto">
+                                <button class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-1"></i> Add New CVR
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- Table --}}
+                        <div class="table-responsive mb-3">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>State</th>
+                                        <th>Zones</th>
+                                        <th>LGAs</th>
+                                        <th>Wards</th>
+                                        <th>PUs</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge bg-warning text-dark rounded-pill">Bauchi</span></td>
+                                        <td><span class="badge bg-info text-dark rounded-pill">288</span></td>
+                                        <td><span class="badge bg-success rounded-pill">321</span></td>
+                                        <td><span class="badge bg-primary rounded-pill">541</span></td>
+                                        <td><span class="badge bg-danger rounded-pill">7456</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <hr>
+
+                    </div> <!-- End card-body -->
+                </div> <!-- End card -->
+            </div>
+        </div>
+
     </section>
-
-  </main><!-- End #main -->
+</main>
 @endsection
 
 @section('footer')
-  @include('pertials.footer')
+  @include('partials.footer')
 @endsection
 
 @section('toast')
-  @include('pertials.toast')
+  @include('partials.toast')
 @endsection

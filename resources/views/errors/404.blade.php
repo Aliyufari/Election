@@ -16,5 +16,5 @@
 @endsection
 
 @section('footer')
-  @include('pertials.footer')
+  @include('partials.footer')
 @endsection

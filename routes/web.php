@@ -1,33 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ElectionsController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CvrController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\StatesController;
-use App\Http\Controllers\ZonesController;
-use App\Http\Controllers\LgasController;
-use App\Http\Controllers\WardsController;
 use App\Http\Controllers\PusController;
-use App\Http\Controllers\SupervisorsController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LgasController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\RolesController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\WardsController;
+use App\Http\Controllers\ZonesController;
+use App\Http\Controllers\StatesController;
 use App\Http\Controllers\RatechsController;
-use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\ResultsController;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\ElectionsController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\SupervisorsController;
 
 //Home
 Route::get('/', [HomeController::class, 'index']);
@@ -45,6 +34,9 @@ Route::put('/profile/{user}', [UsersController::class, 'updateProfile']);
 //for ajax request
 Route::post('/admin/ajax', [AdminController::class, 'ajax']);
 Route::get('/admin', [AdminController::class, 'index']);
+
+//Roles
+Route::get('/admin/roles', [RolesController::class, 'index']);
 
 //User
 Route::get('/admin/users/create', [UsersController::class, 'create']);
@@ -159,5 +151,8 @@ Route::delete('/admin/results/{result}', [ResultsController::class, 'destroy']);
 Route::get('/admin/results', [ResultsController::class, 'index']);
 Route::get('/results/{result}', [ResultsController::class, 'show']);
 
-Route::get('/admin/cvr/voters', [CvrController::class, 'voters']);
-Route::get('/admin/cvr/logins', [CvrController::class, 'logins']);
+Route::middleware('auth')->group(function () {
+    Route::get('/admin/cvr/voters', [CvrController::class, 'voters']);
+    Route::get('/admin/cvr/logins', [CvrController::class, 'logins']);
+    Route::post('/admin/cvr/logins', [CvrController::class, 'storeLogin']);
+});

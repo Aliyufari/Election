@@ -111,6 +111,12 @@
                 <i class="bi bi-people"></i><span>CVR Logins</span>
               </a>
             </li>
+
+            <li>
+              <a href="https://cvr.inecnigeria.org/Home/start" target="_balnk">
+                <i class="bi bi-people"></i><span>Apply New CVR</span>
+              </a>
+            </li>
           </ul>
         </li><!-- End States Nav -->
         @endif
