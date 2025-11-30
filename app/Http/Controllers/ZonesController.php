@@ -18,28 +18,33 @@ class ZonesController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     public function index(Zone $zone)
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
+            return abort(404);
         }
-        else{
-            return view('zones.index', [
-                'zone_state' => $zone,
-                'zones' => $zone->latest()->paginate(10),
-                'states' => State::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-                'sn' => 1,
-            ]);
-        } 
+
+        $zone->load(['state', 'lgas', 'wards', 'pus', 'users']);
+
+        dd($zone);
+        if (request()->wantsJson()) {
+            return response()->json(['zone' => $zone]);
+        }
+
+        return view('zones.index', [
+            'zone' => $zone,
+            'states' => State::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+            'sn' => 1,
+        ]);
     }
 
     public function info(Zone $zone)
     {
-       return view('zones.info', [
+        return view('zones.info', [
             'election' => request('name'),
             'elections' => Election::latest()->get(),
             'states' => State::latest()->get(),
@@ -47,26 +52,26 @@ class ZonesController extends Controller
             'zones' => $zone->latest()->get(),
             'lgas' => Lga::latest()->get(),
             'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(), 
-       ]);   
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function lgas(Zone $zone)
     {
-       return view('zones.lgas', [
+        return view('zones.lgas', [
             'election' => request('name'),
             'elections' => Election::latest()->get(),
             'states' => State::latest()->get(),
             'zone' => $zone,
             'zones' => $zone->latest()->get(),
             'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(), 
-       ]);   
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function list(Zone $zone)
     {
-       return view('zones.list', [
+        return view('zones.list', [
             'election' => DB::table('elections')->where('type', 'Senatorial election')->value('type'),
             'elections' => Election::latest()->get(),
             'states' => State::latest()->get(),
@@ -74,22 +79,21 @@ class ZonesController extends Controller
             'zone_lgas' => DB::table('lgas')->where('state', 'Bauchi'),
             'lgas' => Lga::latest()->get(),
             'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(), 
-       ]);   
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function create()
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
+        } else {
             return view('zones.create', [
                 'states' => State::latest()->get(),
                 'zones' => Zone::latest()->get(),
                 'lgas' => Lga::latest()->get(),
                 'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),  
+                'pus' => Pu::latest()->get(),
             ]);
         }
     }
@@ -99,7 +103,7 @@ class ZonesController extends Controller
         $data = $request->validate([
             'name' => ['required', 'min:3', Rule::unique('zones', 'name')],
             'state_id' => ['required'],
-            'description' => ['required', 'min:24'], 
+            'description' => ['required', 'min:24'],
         ]);
 
         Zone::create($data);
@@ -117,15 +121,14 @@ class ZonesController extends Controller
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
+        } else {
             return view('zones.edit', [
                 'zone' => $zone,
                 'states' => State::latest()->get(),
                 'zones' => $zone->latest()->get(),
                 'lgas' => Lga::latest()->get(),
                 'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(), 
+                'pus' => Pu::latest()->get(),
             ]);
         }
     }
@@ -135,7 +138,7 @@ class ZonesController extends Controller
         $data = $request->validate([
             'name' => ['required', 'min:3'],
             'state_id' => ['required'],
-            'description' => ['required', 'min:24'], 
+            'description' => ['required', 'min:24'],
         ]);
 
         $zone->update($data);

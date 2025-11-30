@@ -30,6 +30,7 @@
 
                         {{-- Header Section --}}
                         <h5 class="card-title fw-bold mb-3">Total Registered Voters</h5>
+                        <hr>
 
                         {{-- Voter Count Cards --}}
                         <div class="row g-3 mb-4 align-items-start justify-content-between">
@@ -142,11 +143,11 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><span class="badge bg-warning text-dark rounded-pill">Bauchi</span></td>
-                                        <td><span class="badge bg-info text-dark rounded-pill">288</span></td>
-                                        <td><span class="badge bg-success rounded-pill">321</span></td>
-                                        <td><span class="badge bg-primary rounded-pill">541</span></td>
-                                        <td><span class="badge bg-danger rounded-pill">7456</span></td>
+                                        <td><span class="badge bg-warning text-dark rounded-pill">Cross River</span></td>
+                                        <td><span class="badge bg-info text-dark rounded-pill">3</span></td>
+                                        <td><span class="badge bg-success rounded-pill">18</span></td>
+                                        <td><span class="badge bg-primary rounded-pill">193</span></td>
+                                        <td><span class="badge bg-danger rounded-pill">3281</span></td>
                                     </tr>
                                 </tbody>
                             </table>

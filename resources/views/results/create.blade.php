@@ -37,7 +37,9 @@
                     <select name="pu_id" id="pu" class="form-select @error('pu_id') is-invalid @enderror" data-dependent="zone">
                       <option disabled>Choose PU</option>
                       @foreach($pus as $pu)
-                        <option value="{{ $pu->id }}">{{ $pu->name }}</option>
+                        <option value="{{ $pu->id }}">
+                          {{ $pu->number }}{{ $pu->name ? ' - ' . $pu->name : '' }}
+                        </option>
                       @endforeach
                     </select>
                       @error('pu_id')

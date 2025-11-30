@@ -60,15 +60,7 @@ class StatesController extends Controller
         $state->load(['lgas', 'users', 'wards', 'pus', 'zones']);
 
         if (request()->wantsJson()) {
-            // dd($state);
-            return response()->json([
-                'state' => $state,
-                // 'lgas'  => $state->lgas,
-                // 'users' => $state->users,
-                // 'wards' => $state->wards,
-                // 'pus'   => $state->pus,
-                // 'zones' => $state->zones,
-            ]);
+            return response()->json(['state' => $state]);
         }
 
         return view('states.show', [

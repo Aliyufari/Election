@@ -86,7 +86,7 @@
 
                     <!-- Action Buttons -->
                     <div class="mt-4 d-flex justify-content-end gap-2" id="action-btn">
-                        <button type="submit" class="btn btn-primary me-2" id="submit-user">Save User</button>
+                        <button type="submit" class="btn btn-primary me-2" id="submit-user">Submit</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </form>
