@@ -43,7 +43,7 @@
                                             <i class="bi bi-person-badge text-primary fs-1 me-3"></i>
                                             <div>
                                                 <div class="fw-bold fs-5 text-dark">21,143,501</div>
-                                                <small class="text-muted">2019 Registered</small>
+                                                <small class="text-muted">Registered Voters</small>
                                             </div>
                                         </div>
                                     </div>
@@ -53,8 +53,8 @@
                                         <div class="p-3 rounded shadow bg-white d-flex align-items-center">
                                             <i class="bi bi-person-badge text-primary fs-1 me-3"></i>
                                             <div>
-                                                <div class="fw-bold fs-5 text-dark">25,236,967</div>
-                                                <small class="text-muted">2023 Registered</small>
+                                                <div class="fw-bold fs-5 text-dark">967</div>
+                                                <small class="text-muted">Registered Today</small>
                                             </div>
                                         </div>
                                     </div>
@@ -64,8 +64,8 @@
                                         <div class="p-3 rounded shadow bg-white d-flex align-items-center">
                                             <i class="bi bi-graph-up-arrow text-success fs-1 me-3"></i>
                                             <div>
-                                                <div class="fw-bold fs-5 text-dark">1,587,018</div>
-                                                <small class="text-muted">Difference</small>
+                                                <div class="fw-bold fs-5 text-dark">110</div>
+                                                <small class="text-muted">Inter-State Transfer</small>
                                             </div>
                                         </div>
                                     </div>
