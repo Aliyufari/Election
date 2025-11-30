@@ -93,6 +93,7 @@
                                         <select class="form-select">
                                             <option selected>Select State</option>
                                             <option>Bauchi</option>
+                                            <option>Cross River</option>
                                             <option>Gombe</option>
                                         </select>
                                     </div>
