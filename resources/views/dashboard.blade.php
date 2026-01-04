@@ -77,7 +77,7 @@
                 </div>
                 <div class="flex-grow-1">
                   <h6 class="card-title mb-1 small" style="font-size: 1rem;">Zones</h6>
-                  <h4 class="fw-bold mb-0" style="font-size: 1.4rem;">36</h4>
+                  <h4 class="fw-bold mb-0" style="font-size: 1.4rem;">108</h4>
                 </div>
               </div>
             </div>
@@ -103,11 +103,11 @@
             <div class="card info-card customers-card border-0 shadow-sm h-100">
               <div class="card-body d-flex align-items-center p-3">
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: rgba(255, 119, 29, 0.1);">
-                  <i class="bi bi-person-circle text-warning" style="font-size: 1.5rem;"></i>
+                  <i class="bi bi-collection text-warning" style="font-size: 1.5rem;"></i>
                 </div>
                 <div class="flex-grow-1">
-                  <h6 class="card-title mb-1 small" style="font-size: 1rem;">Supervisors</h6>
-                  <h4 class="fw-bold mb-0" style="font-size: 1.4rem;">1,244</h4>
+                  <h6 class="card-title mb-1 small" style="font-size: 1rem;">Wards</h6>
+                  <h4 class="fw-bold mb-0" style="font-size: 1.4rem;">8,809</h4>
                 </div>
               </div>
             </div>
@@ -128,7 +128,7 @@
                 </ul>
               </div>
               <div class="card-body">
-                <h5 class="card-title">Accreditation Report Analysis</h5>
+                <h5 class="card-title">CVR Analysis</h5>
                 <!-- Line Chart -->
                 <div id="reportsChart"></div>
                 <script>
@@ -141,8 +141,8 @@
                         name: 'LGAs',
                         data: [11, 32, 45, 32, 34, 52, 41]
                       }, {
-                        name: 'Accreditations',
-                        data: [15, 11, 32, 18, 9, 24, 11]
+                        name: 'CVRs',
+                        data: [55, 61, 74, 105, 92, 105, 155]
                       }],
                       chart: {
                         height: 350,

@@ -23,19 +23,18 @@ class LoginController extends Controller
             'username' => ['required'],
             'password' => ['required'],
         ]);
-        
-        if(auth()->attempt($credentials))
-        {
-           $request->session()->regenerate();
 
-           return redirect()
-                  ->intended('/')
-                  ->with(['success' => 'Logged in Successfully!']);
+        if (auth()->attempt($credentials)) {
+            $request->session()->regenerate();
+
+            return redirect()
+                ->intended('/')
+                ->with(['success' => 'Logged in Successfully!']);
         }
 
         return redirect('/login')
-               ->withErrors(['username' => 'Invalid Username / Password'])
-               ->onlyInput('username'); 
+            ->withErrors(['username' => 'Invalid Username / Password'])
+            ->onlyInput('username');
     }
 
     public function logout(Request $request)
@@ -46,5 +45,5 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login')->with('success', 'Logged out successfully!');
-    } 
+    }
 }

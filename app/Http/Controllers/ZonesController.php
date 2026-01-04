@@ -19,21 +19,23 @@ class ZonesController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(Zone $zone)
+    public function index()
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort(404);
         }
 
-        $zone->load(['state', 'lgas', 'wards', 'pus', 'users']);
+        $zones = Zone::with(['state', 'lgas', 'wards', 'pus', 'users'])
+            ->latest();
 
-        dd($zone);
+
+
         if (request()->wantsJson()) {
-            return response()->json(['zone' => $zone]);
+            return response()->json(['zones' => $zones->get()]);
         }
 
         return view('zones.index', [
-            'zone' => $zone,
+            'zones' => $zones->paginate(10),
             'states' => State::latest()->get(),
             'lgas' => Lga::latest()->get(),
             'wards' => Ward::latest()->get(),

@@ -12,6 +12,80 @@ use App\Models\State;
 
 class CvrController extends Controller
 {
+    public function states()
+    {
+        $states = State::with('zones', 'lgas', 'wards', 'pus', 'users')->paginate(10);
+
+        if (strtolower(auth()->user()->role) !== 'admin') {
+            return abort('404');
+        } else {
+            return view('cvr.states', [
+                'states' => $states,
+                'zones' => Zone::latest()->get(),
+                'lgas' => Lga::latest()->get(),
+                'wards' => Ward::latest()->get(),
+                'pus' => Pu::latest()->get(),
+                'sn' => 1,
+            ]);
+        }
+    }
+
+    public function zones(State $state)
+    {
+        if (strtolower(auth()->user()->role) !== 'admin') {
+            abort(404);
+        }
+
+        $zones = $state->zones()->with('state', 'lgas')->get();
+
+        return view('cvr.zones', [
+            'state' => $state,
+            'zones' => $zones,
+        ]);
+    }
+
+    public function lgas(State $state, Zone $zone)
+    {
+        if (strtolower(auth()->user()->role) !== 'admin') {
+            abort(404);
+        }
+
+        $lgas = $zone->lgas()->with('zone', 'wards')->get();
+
+        return view('cvr.lgas', [
+            'zone' => $zone,
+            'lgas' => $lgas,
+        ]);
+    }
+
+    public function wards(State $state, Zone $zone, Lga $lga)
+    {
+        if (strtolower(auth()->user()->role) !== 'admin') {
+            abort(404);
+        }
+
+        $wards = $lga->wards()->with('lga', 'pus')->get();
+
+        return view('cvr.wards', [
+            'lga' => $lga,
+            'wards' => $wards,
+        ]);
+    }
+
+    public function pus(State $state, Zone $zone, Lga $lga, Ward $ward)
+    {
+        if (strtolower(auth()->user()->role) !== 'admin') {
+            abort(404);
+        }
+
+        $pus = $ward->pus()->with('ward')->get();
+
+        return view('cvr.pus', [
+            'ward' => $ward,
+            'pus' => $pus,
+        ]);
+    }
+
     public function voters()
     {
         if (strtolower(auth()->user()->role) !== 'admin') {

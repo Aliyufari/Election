@@ -17,6 +17,12 @@
         <ul id="state-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
 
           <li>
+            <a href="/admin/cvr/states">
+              <i class="bi bi-people"></i><span>CVR</span>
+            </a>
+          </li>
+
+          <li>
             <a href="/admin/list">
               <i class="bi bi-binoculars"></i><span>Accreditations</span>
             </a>
