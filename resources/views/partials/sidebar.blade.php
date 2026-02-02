@@ -23,21 +23,15 @@
           </li>
 
           <li>
-            <a href="/admin/list">
+            <a href="/admin/state/list">
               <i class="bi bi-binoculars"></i><span>Accreditations</span>
             </a>
           </li>
-
-          @if(isset(auth()->user()->name))
-            @if(strtolower(auth()->user()->role) === 'admin')
-              <li>
-                <a href="/admin/states">
-                  <i class="bi bi-gear"></i><span>Manage States</span>
-                </a>
-              </li>
-            @endif
-          @endif
-
+            <li>
+              <a href="/admin/states">
+                <i class="bi bi-gear"></i><span>Manage States</span>
+              </a>
+            </li>
         </ul>
       </li><!-- End States Nav -->
 
@@ -99,34 +93,36 @@
         </a>
       </li><!-- End Parties Nav -->
 
-      @if(isset(auth()->user()->name))
-        @if(strtolower(auth()->user()->role) === 'admin')
-        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#cvr-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-person-square"></i><span>CVR Panel</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="cvr-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-            <li>
-              <a href="/admin/cvr/voters">
-                <i class="bi bi-gear"></i><span>Total Registered Voters</span>
-              </a>
-            </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#cvr-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-person-square"></i><span>CVR Panel</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="cvr-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/admin/cvr/voters">
+              <i class="bi bi-gear"></i><span>Total Registered Voters</span>
+            </a>
+          </li>
 
-            <li>
-              <a href="/admin/cvr/logins">
-                <i class="bi bi-people"></i><span>CVR Logins</span>
-              </a>
-            </li>
+          <li>
+            <a href="/admin/cvr/records">
+              <i class="bi bi-people"></i><span>CVR Records</span>
+            </a>
+          </li>
 
-            <li>
-              <a href="https://cvr.inecnigeria.org/Home/start" target="_balnk">
-                <i class="bi bi-people"></i><span>Apply New CVR</span>
-              </a>
-            </li>
-          </ul>
-        </li><!-- End States Nav -->
-        @endif
-      @endif
+          <li>
+            <a href="/admin/cvr/logins">
+              <i class="bi bi-people"></i><span>CVR Logins</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="https://cvr.inecnigeria.org/Home/start" target="_balnk">
+              <i class="bi bi-people"></i><span>Apply New CVR</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End States Nav -->
 
       <li class="nav-item">
         <a class="nav-link {{ request()->is('admin/results*') ? 'active' : 'collapsed' }}" href="/admin/results">

@@ -2,30 +2,19 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Role;
+use App\Enums\Role as RoleEnum;
+use Illuminate\Database\Seeder;
 
 class RoleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
-        $roles = [
-            'super',
-            'admin',
-            'user',
-            'ratech',
-            'supervisor',
-            'state_coodinator',
-            'lga_coodinator'
-        ];
-
-        foreach ($roles as $roleName) {
-            Role::updateOrCreate(['name' => $roleName], ['name' => $roleName]);
+        foreach (RoleEnum::cases() as $role) {
+            Role::updateOrCreate(['name' => $role]);
         }
     }
 }

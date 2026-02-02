@@ -27,7 +27,6 @@ return new class extends Migration
                         $table->string('password');
                         $table->string('gender')->nullable();
                         $table->string('image')->nullable();
-                        $table->string('role')->default('User');
                         $table->foreignIdFor(Role::class, 'role_id')->nullable()->constrained()->nullOnDelete();
                         $table->foreignIdFor(State::class, 'state_id')->nullable()->constrained()->nullOnDelete();
                         $table->foreignIdFor(Zone::class, 'zone_id')->nullable()->constrained()->nullOnDelete();

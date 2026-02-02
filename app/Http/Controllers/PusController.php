@@ -20,49 +20,39 @@ class PusController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     public function index(Pu $pu)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('pus.index', [
-                'pus' => $pu->latest()->paginate(10),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'sn' => 1,
-            ]);
-        }
+        return view('admin.pus.index', [
+            'pus' => $pu->latest()->paginate(10),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'sn' => 1,
+        ]);
     }
 
     public function create()
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('pus.create', [
-                'states' => State::latest()->get(),
-                'elections' => Election::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }
+        return view('admin.pus.create', [
+            'states' => State::latest()->get(),
+            'elections' => Election::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function store(Request $request)
-    {  
+    {
         $data = $request->validate([
             'number' => ['required', Rule::unique('pus', 'number')],
             'state_id' => ['required'],
             'zone_id' => ['required'],
             'lga_id' => ['required'],
-            'ward_id' => ['required'], 
+            'ward_id' => ['required'],
         ]);
 
         Pu::create($data);
@@ -70,26 +60,18 @@ class PusController extends Controller
         return redirect('/admin/pus')->with('success', 'PU created successfully!');
     }
 
-    public function show(Pu $pu)
-    {
-        
-    }
+    public function show(Pu $pu) {}
 
     public function edit(Pu $pu)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('pus.edit', [
-                'pu' => $pu,
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }
+        return view('admin.pus.edit', [
+            'pu' => $pu,
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function update(Request $request, Pu $pu)
@@ -101,7 +83,7 @@ class PusController extends Controller
             'zone_id' => ['required'],
             'lga_id' => ['required'],
             'ward_id' => ['required'],
-            'description' => ['required', 'min:24'], 
+            'description' => ['required', 'min:24'],
         ]);
 
         $pu->update($data);
@@ -130,7 +112,7 @@ class PusController extends Controller
     public function accreditations(Request $request, Pu $pu)
     {
         $data = $request->validate([
-            'accreditation' => ['required'], 
+            'accreditation' => ['required'],
         ]);
 
         dd($pu);
@@ -138,7 +120,7 @@ class PusController extends Controller
         $pu->update($data);
 
         return redirect()
-                ->back()
-                ->with('success', 'Updated successfully!');
+            ->back()
+            ->with('success', 'Updated successfully!');
     }
 }

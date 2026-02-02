@@ -10,20 +10,25 @@ class Pu extends Model
     use HasFactory;
 
     protected $fillable = [
-     'number',
-     'name',
-     'state_id',
-     'zone_id',
-     'lga_id',
-     'ward_id',
-     'description',
-     'accreditation',
-     'registration',
+        'number',
+        'name',
+        'state_id',
+        'zone_id',
+        'lga_id',
+        'ward_id',
+        'description',
+        'accreditation',
+        'registration',
     ];
 
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function cvrs()
+    {
+        return $this->hasMany(Cvr::class);
     }
 
     public function results()

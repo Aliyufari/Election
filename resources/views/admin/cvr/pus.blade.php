@@ -57,7 +57,7 @@
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                             <small class="text-success fw-semibold">PUs</small>
-                            <h3 class="fw-bold mb-0">{{ count($ward->pus) }}</h3>
+                            <h3 class="fw-bold mb-0">{{ count($pus) }}</h3>
                             </div>
                             <i class="bi bi-pin-map text-success fs-1"></i>
                         </div>
@@ -69,7 +69,7 @@
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                             <small class="text-info fw-semibold">Total CVRs</small>
-                            <h3 class="fw-bold mb-0">80</h3>
+                            <h3 class="fw-bold mb-0">{{ $wardCvrCount }}</h3>
                             </div>
                             <i class="bi bi-file-text text-info fs-1"></i>
                         </div>
@@ -77,10 +77,10 @@
                     </div>
                 </div>
 
-                <!-- LGA List -->
+                <!-- PU List -->
                 <div class="list-group list-group-flush">
 
-                  @foreach($ward->pus as $pu)
+                  @forelse($pus as $pu)
                     <div class="list-group-item py-3 bg-light border rounded-3 shadow-sm mb-2">
                         <div class="row align-items-center">
 
@@ -91,28 +91,41 @@
                             </h6>
 
                             <div class="d-flex flex-wrap gap-3 small text-muted mt-1">
-                            <span class="d-flex align-items-center">
-                                {{-- <i class="bi bi-pin-map me-1 text-secondary"></i> --}}
-                                <strong class="me-1">{{ $pu->number }}</strong>
-                            </span>
+                                <span class="d-flex align-items-center">
+                                    <strong class="me-1">{{ $pu->number }}</strong>
+                                </span>
 
-                            <span class="d-flex align-items-center">
-                                <i class="bi bi-file-text me-1 text-secondary"></i>
-                                <strong class="me-1">100</strong> CVRs
-                            </span>
+                                <span class="d-flex align-items-center">
+                                    <i class="bi bi-file-text me-1 text-secondary"></i>
+                                    <strong class="me-1">{{ $pu->cvr_count }}</strong> CVRs
+                                </span>
                             </div>
                         </div>
 
-                        <div class="col-md-3 text-md-end mt-3 mt-md-0">
-                            <a href="/admin/states/{{$ward->state->id}}/zones/{{$ward->zone->id}}/lgas/{{$ward->lga->id}}/wards/{{$ward->id}}/pus/{{$pu->id}}/cvr" class="btn btn-outline-primary btn-sm px-3">
-                            <i class="bi bi-eye me-1"></i>
-                            View CVRs
-                            </a>
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mb-3">
+                          <button 
+                              class="btn btn-outline-success btn-sm px-3" 
+                              data-bs-toggle="modal" 
+                              data-bs-target="#update-pu-cvr-modal" 
+                              data-pu-id="{{ $pu->id }}">
+                              Add CVRs
+                          </button>
+
+                          <a href="/admin/states/{{$pu->state->id}}/zones/{{$pu->zone->id}}/lgas/{{$pu->lga->id}}/wards/{{$pu->ward->id}}/pus/{{$pu->id}}/cvr" 
+                            class="btn btn-outline-primary btn-sm px-3">
+                              <i class="bi bi-eye me-1"></i>
+                              View CVRs
+                          </a>
                         </div>
 
                         </div>
                     </div>
-                    @endforeach
+                  @empty
+                    <div class="alert alert-warning">
+                      No PUs found for this ward.
+                    </div>
+                  @endforelse
 
                 </div>
 
@@ -126,7 +139,49 @@
     </div>
   </section>
 
-</main>
+<</main>
+
+@include('admin.cvr.update-pu-cvr-modal') {{-- modal partial --}}
+
+@endsection
+
+@section('script')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const updateModal = document.getElementById('update-pu-cvr-modal');
+
+    updateModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const puId = button.getAttribute('data-pu-id');
+        const input = updateModal.querySelector('#modal-pu-id');
+        input.value = puId;
+    });
+
+    const form = document.getElementById('update-pu-cvr-form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const puId = form.querySelector('#modal-pu-id').value;
+        const count = form.querySelector('#pu-cvr-count').value;
+
+        fetch('/admin/cvrs/update-pu', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ pu_id: puId, count: count })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                location.reload();
+            } else {
+                alert('Error adding CVRs');
+            }
+        });
+    });
+});
+</script>
 @endsection
 
 @section('footer')

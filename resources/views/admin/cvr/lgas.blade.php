@@ -57,7 +57,7 @@
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                             <small class="text-success fw-semibold">LGAs</small>
-                            <h3 class="fw-bold mb-0">{{ count($zone->lgas) }}</h3>
+                            <h3 class="fw-bold mb-0">{{ count($lgas) }}</h3>
                             </div>
                             <i class="bi bi-shop text-success fs-1"></i>
                         </div>
@@ -69,7 +69,7 @@
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                             <small class="text-info fw-semibold">Total CVRs</small>
-                            <h3 class="fw-bold mb-0">2,850</h3>
+                            <h3 class="fw-bold mb-0">{{ $zoneCvrCount }}</h3>
                             </div>
                             <i class="bi bi-file-text text-info fs-1"></i>
                         </div>
@@ -80,7 +80,7 @@
                 <!-- LGA List -->
                 <div class="list-group list-group-flush">
 
-                  @foreach($zone->lgas as $lga)
+                  @forelse($lgas as $lga)
                     <div class="list-group-item py-3 bg-light border rounded-3 shadow-sm mb-2">
                         <div class="row align-items-center">
 
@@ -98,7 +98,7 @@
 
                             <span class="d-flex align-items-center">
                                 <i class="bi bi-file-text me-1 text-secondary"></i>
-                                <strong class="me-1">100</strong> CVRs
+                                <strong class="me-1">{{ $lga->cvr_count }}</strong> CVRs
                             </span>
                             </div>
                         </div>
@@ -112,7 +112,11 @@
 
                         </div>
                     </div>
-                    @endforeach
+                  @empty
+                    <div class="alert alert-warning">
+                      No LGAs found for this zone.
+                    </div>
+                  @endforelse
 
                 </div>
 

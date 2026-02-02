@@ -21,55 +21,30 @@ class StatesController extends Controller
 
     public function index(State $state)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        } else {
-            return view('states.index', [
-                'states' => $state->paginate(10),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-                'sn' => 1,
-            ]);
-        }
+        return view('admin.states.index', [
+            'states' => $state->paginate(10),
+            'sn' => 1,
+        ]);
     }
 
     public function list(State $state)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        } else {
-            return view('states.list', [
-                'states' => $state->paginate(10),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-                'sn' => 1,
-            ]);
-        }
+        return view('admin.states.list', [
+            'states' => $state->paginate(10),
+            'sn' => 1,
+        ]);
     }
 
     public function show(State $state)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            abort(404);
-        }
-
         $state->load(['lgas', 'users', 'wards', 'pus', 'zones']);
 
-        if (request()->wantsJson()) {
+        if (request()->wantsJson() || request()->expectsJson()) {
             return response()->json(['state' => $state]);
         }
 
-        return view('states.show', [
+        return view('admin.states.show', [
             'state' => $state,
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
         ]);
     }
 
@@ -85,7 +60,7 @@ class StatesController extends Controller
             'Councillor'
         ];
 
-        return view('states.info', [
+        return view('admin.states.info', [
             'election_list' => $elections,
             'state' => $state,
             'states' => State::latest()->get(),
@@ -100,7 +75,7 @@ class StatesController extends Controller
 
     public function zones(State $state)
     {
-        return view('states.zones', [
+        return view('admin.states.zones', [
             'election' => request('name'),
             'elections' => Election::latest()->get(),
             'states' => State::latest()->get(),
@@ -115,17 +90,14 @@ class StatesController extends Controller
 
     public function create()
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        } else {
-            return view('states.create', [
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }
+
+        return view('admin.states.create', [
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -142,18 +114,15 @@ class StatesController extends Controller
 
     public function edit(State $state)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        } else {
-            return view('states.edit', [
-                'state' => $state,
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }
+
+        return view('admin.states.edit', [
+            'state' => $state,
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function update(Request $request, State $state)

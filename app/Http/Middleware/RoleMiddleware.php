@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
@@ -16,19 +16,18 @@ class RoleMiddleware
      * @param  string  $roles  Comma-separated list of roles
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, string $roles)
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        $user = Auth::user();
+        $user = $request->user();
 
-        if (!$user) {
-            return redirect()->route('login')
-                ->with('error', 'You must be logged in to access this page.');
+        // Auth middleware should handle this, but safety check
+        if (! $user) {
+            abort(403, 'Unauthenticated.');
         }
 
-        $allowedRoles = explode(',', $roles);
-
-        if (!in_array($user->role->name, $allowedRoles)) {
-            abort(403, 'Unauthorized');
+        // Relationship-based role check
+        if (! in_array($user->role->name, $roles)) {
+            abort(403, 'Unauthorized.');
         }
 
         return $next($request);

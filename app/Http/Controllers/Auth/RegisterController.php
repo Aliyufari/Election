@@ -15,18 +15,18 @@ class RegisterController extends Controller
 {
     public function create()
     {
-        return view('auth.register');
+        return view('admin.auth.register');
     }
 
     public function store(Request $request)
     {
-         $credentials = $request->validate([
+        $credentials = $request->validate([
             'name' => ['required', 'min:3'],
             'username' => ['required', Rule::unique('users', 'username')],
             'email' => ['required', 'email', Rule::unique('users', 'email')],
-            'password' => ['required','min:8'],
+            'password' => ['required', 'min:8'],
         ]);
-         
+
         //Hash Password
         $credentials['password'] = bcrypt($credentials['password']);
 

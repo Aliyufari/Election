@@ -20,27 +20,22 @@ class ResultsController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     public function index(Result $result)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('results.index', [
-                'results' => $result->latest()->paginate(10),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'sn' => 1,
-            ]);
-        }
+        return view('admin.results.index', [
+            'results' => $result->latest()->paginate(10),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'sn' => 1,
+        ]);
     }
 
     public function show(Result $result)
-    { 
-        return view('results.show', [
+    {
+        return view('admin.results.show', [
             'result' => $result,
             'results' => $result->latest()->paginate(10),
             'election' => request('name'),
@@ -54,19 +49,14 @@ class ResultsController extends Controller
 
     public function create()
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('results.create', [
-                'elections' => Election::latest()->get(),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }
+        return view('admin.results.create', [
+            'elections' => Election::latest()->get(),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -78,8 +68,7 @@ class ResultsController extends Controller
         ]);
 
         //Image Upload
-        if ($request->hasFile('image')) 
-        {
+        if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('assets/img/results', 'public');
         }
 
@@ -91,20 +80,15 @@ class ResultsController extends Controller
 
     public function edit(Result $result)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('results.edit', [
-                'result' => $result,
-                'elections' => Election::latest()->get(),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }
+        return view('admin.results.edit', [
+            'result' => $result,
+            'elections' => Election::latest()->get(),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function update(Request $request, Result $result)
@@ -116,8 +100,7 @@ class ResultsController extends Controller
         ]);
 
         //Image Upload
-        if ($request->hasFile('image')) 
-        {
+        if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('assets/img/results', 'public');
         }
 
@@ -127,7 +110,7 @@ class ResultsController extends Controller
         return redirect('/admin/results')->with('success', 'Result updated successfully!');
     }
 
-     public function destroy(Result $result)
+    public function destroy(Result $result)
     {
         $result->delete();
 

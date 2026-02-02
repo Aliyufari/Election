@@ -19,57 +19,42 @@ class MessagesController extends Controller
     {
         $this->middleware('auth');
     }
-    
-     public function index(Message $message)
-    {   
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('messages.index', [
-                'messages' => $message->latest()->paginate(10),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-                'sn' => 1,
-            ]);
-        }   
+
+    public function index(Message $message)
+    {
+        return view('admin.messages.index', [
+            'messages' => $message->latest()->paginate(10),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+            'sn' => 1,
+        ]);
     }
 
     public function show(Message $message)
-    {   
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            $message->update(['is_read' => 1]);
-            return view('messages.show', [
-                'message' => $message,
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }   
+    {
+        $message->update(['is_read' => 1]);
+        return view('admin.messages.show', [
+            'message' => $message,
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function create()
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('messages.create', [
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]); 
-        } 
+        return view('admin.messages.create', [
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -89,19 +74,14 @@ class MessagesController extends Controller
 
     public function edit(Message $message)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('messages.edit', [
-                'msg' => $message,
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }  
+        return view('admin.messages.edit', [
+            'msg' => $message,
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function update(Request $request, Message $message)

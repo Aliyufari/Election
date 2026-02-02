@@ -13,73 +13,58 @@ use App\Models\Pu;
 
 class ElectionsController extends Controller
 {
-     public function __construct()
+    public function __construct()
     {
         $this->middleware('auth');
     }
-    
-     public function index(Election $election)
+
+    public function index(Election $election)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('elections.index', [
-                'elections' => $election->latest()->paginate(10),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-                'sn' => 1,
-            ]);
-        }   
+        return view('admin.elections.index', [
+            'elections' => $election->latest()->paginate(10),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+            'sn' => 1,
+        ]);
     }
 
     public function show(Election $election)
-    {   
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-           return view('elections.show', [
-                'election' => $election,
-                'states' => State::latest()->get(),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-           ]);  
-        } 
+    {
+        return view('admin.elections.show', [
+            'election' => $election,
+            'states' => State::latest()->get(),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function create()
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            $elections = [
-                'Presidential election',
-                'Governorship election',
-                'Senatorial election',
-                'House of Representatives election',
-                'House of Assemby election',
-                'Chairmanship',
-                'Councillor'
-            ];
+        $elections = [
+            'Presidential election',
+            'Governorship election',
+            'Senatorial election',
+            'House of Representatives election',
+            'House of Assemby election',
+            'Chairmanship',
+            'Councillor'
+        ];
 
-            return view('elections.create', [
-                'election_list' => $elections,
-                'elections' => Election::latest()->get(),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);  
-        }
+        return view('admin.elections.create', [
+            'election_list' => $elections,
+            'elections' => Election::latest()->get(),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -96,31 +81,26 @@ class ElectionsController extends Controller
 
     public function edit(Election $election)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-           $elections = [
-                'Presidential election',
-                'Governorship election',
-                'Senatorial election',
-                'House of Representatives election',
-                'House of Assemby election',
-                'Chairmanship',
-                'Councillor'
-            ];
+        $elections = [
+            'Presidential election',
+            'Governorship election',
+            'Senatorial election',
+            'House of Representatives election',
+            'House of Assemby election',
+            'Chairmanship',
+            'Councillor'
+        ];
 
-            return view('elections.edit', [
-                'election' => $election,
-                'elections' => Election::latest()->get(),
-                'election_list' => $elections,
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);   
-        }
+        return view('admin.elections.edit', [
+            'election' => $election,
+            'elections' => Election::latest()->get(),
+            'election_list' => $elections,
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function update(Request $request, Election $election)

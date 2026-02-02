@@ -17,27 +17,23 @@ class LgasController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     public function index(Lga $lga)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('lgas.index', [
-                'lgas' => $lga->latest()->paginate(10),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-                'sn' => 1,
-            ]);
-        }
+
+        return view('admin.lgas.index', [
+            'lgas' => $lga->latest()->paginate(10),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+            'sn' => 1,
+        ]);
     }
 
     public function info(Lga $lga)
     {
-       return view('lgas.info', [
+        return view('admin.lgas.info', [
             'election' => request('name'),
             'states' => State::latest()->get(),
             'zones' => Zone::latest()->get(),
@@ -45,23 +41,18 @@ class LgasController extends Controller
             'lgas' => Lga::latest()->get(),
             'wards' => Ward::latest()->get(),
             'pus' => Pu::latest()->get(),
-       ]);   
+        ]);
     }
 
     public function create()
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('lgas.create', [
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }
+        return view('admin.lgas.create', [
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -70,7 +61,7 @@ class LgasController extends Controller
             'name' => ['required', 'min:3', Rule::unique('lgas', 'name')],
             'state_id' => ['required'],
             'zone_id' => ['required'],
-            'description' => ['required', 'min:24'], 
+            'description' => ['required', 'min:24'],
         ]);
 
         Lga::create($data);
@@ -80,24 +71,22 @@ class LgasController extends Controller
 
     public function show(Lga $lga)
     {
-        
+        return response()->json([
+            'lga' => $lga->load('wards')
+        ]);
     }
 
     public function edit(Lga $lga)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-           return view('lgas.edit', [
-                'lga' => $lga,
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]);
-        }
+
+        return view('admin.lgas.edit', [
+            'lga' => $lga,
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function update(Request $request, Lga $lga)
@@ -106,7 +95,7 @@ class LgasController extends Controller
             'name' => ['required', 'min:3'],
             'state_id' => ['required'],
             'zone_id' => ['required'],
-            'description' => ['required', 'min:24'], 
+            'description' => ['required', 'min:24'],
         ]);
 
         $lga->update($data);

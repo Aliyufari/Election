@@ -20,14 +20,13 @@ class RatechsController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     public function index(User $user)
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
-            return view('ratechs.index', [
+        } else {
+            return view('admin.ratechs.index', [
                 'users' => $user->latest()->paginate(10),
                 'states' => State::latest()->get(),
                 'zones' => Zone::latest()->get(),
@@ -35,41 +34,39 @@ class RatechsController extends Controller
                 'wards' => Ward::latest()->get(),
                 'pus' => Pu::latest()->get(),
                 'sn' => 1,
-            ]); 
-        }  
+            ]);
+        }
     }
 
     public function show(User $user)
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
-           return view('ratechs.show', [
+        } else {
+            return view('admin.ratechs.show', [
                 'user' => $user,
                 'states' => State::latest()->get(),
                 'zones' => Zone::latest()->get(),
                 'lgas' => Lga::latest()->get(),
                 'wards' => Ward::latest()->get(),
                 'pus' => Pu::latest()->get(),
-           ]); 
-        }  
+            ]);
+        }
     }
 
     public function create(State $state)
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
-            return view('ratechs.create', [
+        } else {
+            return view('admin.ratechs.create', [
                 'states' => State::latest()->get(),
                 'zones' => Zone::latest()->get(),
                 'lgas' => Lga::latest()->get(),
                 'wards' => Ward::latest()->get(),
                 'pus' => Pu::latest()->get(),
             ]);
-        }  
+        }
     }
 
     public function store(Request $request)
@@ -78,7 +75,7 @@ class RatechsController extends Controller
             'name' => ['required', 'min:3'],
             'username' => ['required', Rule::unique('users', 'username')],
             'email' => ['required', 'email', Rule::unique('users', 'email')],
-            'password' => ['required','min:8'],
+            'password' => ['required', 'min:8'],
             'gender' => ['required'],
             'phone' => ['required'],
             'image' => ['required', 'mimes:jpg,png,jpeg'],
@@ -94,8 +91,7 @@ class RatechsController extends Controller
         $credentials['password'] = bcrypt($credentials['password']);
 
         //Image Upload
-        if ($request->hasFile('image')) 
-        {
+        if ($request->hasFile('image')) {
             $credentials['image'] = $request->file('image')->store('assets/img/users', 'public');
         }
 
@@ -108,17 +104,16 @@ class RatechsController extends Controller
     {
         if (strtolower(auth()->user()->role) !== 'admin') {
             return abort('404');
-        }
-        else{
-           return view('ratechs.edit', [
+        } else {
+            return view('admin.ratechs.edit', [
                 'user' => $user,
                 'states' => State::latest()->get(),
                 'zones' => Zone::latest()->get(),
                 'lgas' => Lga::latest()->get(),
                 'wards' => Ward::latest()->get(),
                 'pus' => Pu::latest()->get(),
-           ]); 
-        } 
+            ]);
+        }
     }
 
     public function update(Request $request, User $user)
@@ -127,7 +122,7 @@ class RatechsController extends Controller
             'name' => ['required', 'min:3'],
             'username' => ['required'],
             'email' => ['required', 'email'],
-            'password' => ['required','min:8'],
+            'password' => ['required', 'min:8'],
             'gender' => ['required'],
             'phone' => ['required'],
             'image' => ['required', 'mimes:jpg,png,jpeg'],
@@ -143,8 +138,7 @@ class RatechsController extends Controller
         $credentials['password'] = bcrypt($credentials['password']);
 
         //Image Upload
-        if ($request->hasFile('image')) 
-        {
+        if ($request->hasFile('image')) {
             $credentials['image'] = $request->file('image')->store('assets/img/users', 'public');
         }
 

@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CvrController;
 use App\Http\Controllers\PusController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LgasController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RolesController;
@@ -18,15 +18,15 @@ use App\Http\Controllers\ElectionsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SupervisorsController;
 
-//Home
-Route::get('/', [HomeController::class, 'index']);
-
 //Login
 Route::get('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/login', [LoginController::class, 'auth']);
 Route::post('/logout', [LoginController::class, 'logout']);
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'role:admin,super')->group(function () {
+    //Dashboard
+    Route::get('/', [DashboardController::class, 'index']);
+
     //User Profile Update
     Route::get('/profile', [UsersController::class, 'profile']);
     Route::put('/update/{user}', [UsersController::class, 'updatePassword']);
@@ -76,7 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/states/{state}/info', [StatesController::class, 'info']);
     // Route::get('/states/{zone}/info', [StatesController::class, 'info']);
     Route::get('/states/{state}/zones', [StatesController::class, 'zones']);
-    Route::get('/admin/list', [StatesController::class, 'list']);
+    Route::get('/admin/state/list', [StatesController::class, 'list']);
     Route::get('/admin/states', [StatesController::class, 'index']);
 
     //Zone
@@ -153,6 +153,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/results/{result}', [ResultsController::class, 'show']);
 
     //CVR
+    Route::get('/admin/cvr/records', [CvrController::class, 'index']);
+    Route::post('/admin/cvrs', [CvrController::class, 'store']);
+    Route::post('/admin/cvrs/update', [CvrController::class, 'updateWardCvr']);
+    Route::post('/admin/cvrs/update-pu', [CvrController::class, 'updatePuCvr']);
     Route::get('/admin/cvr/states', [CvrController::class, 'states']);
     Route::get('/admin/cvr/voters', [CvrController::class, 'voters']);
     Route::get('/admin/cvr/logins', [CvrController::class, 'logins']);

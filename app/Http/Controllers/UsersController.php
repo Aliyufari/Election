@@ -20,56 +20,41 @@ class UsersController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     public function index(User $user)
-    {   
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('users.index', [
-                'users' => $user->latest()->paginate(10),
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-                'sn' => 1,
-            ]);
-        }   
+    {
+        return view('admin.users.index', [
+            'users' => $user->latest()->paginate(10),
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+            'sn' => 1,
+        ]);
     }
 
     public function show(User $user)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-           return view('users.show', [
-                'user' => $user,
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-           ]);
-        }   
+        return view('admin.users.show', [
+            'user' => $user,
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function create(State $state)
-    {   
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-            return view('users.create', [
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-            ]); 
-        } 
+    {
+        return view('admin.users.create', [
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -78,7 +63,7 @@ class UsersController extends Controller
             'name' => ['required', 'min:3'],
             'username' => ['required', Rule::unique('users', 'username')],
             'email' => ['required', 'email', Rule::unique('users', 'email')],
-            'password' => ['required','min:8'],
+            'password' => ['required', 'min:8'],
             'gender' => ['required'],
             'phone' => ['required'],
             'image' => ['required', 'mimes:jpg,png,jpeg'],
@@ -94,8 +79,7 @@ class UsersController extends Controller
         $credentials['password'] = bcrypt($credentials['password']);
 
         //Image Upload
-        if ($request->hasFile('image')) 
-        {
+        if ($request->hasFile('image')) {
             $credentials['image'] = $request->file('image')->store('assets/img/users', 'public');
         }
 
@@ -106,19 +90,14 @@ class UsersController extends Controller
 
     public function edit(User $user)
     {
-        if (strtolower(auth()->user()->role) !== 'admin') {
-            return abort('404');
-        }
-        else{
-           return view('users.edit', [
-                'user' => $user,
-                'states' => State::latest()->get(),
-                'zones' => Zone::latest()->get(),
-                'lgas' => Lga::latest()->get(),
-                'wards' => Ward::latest()->get(),
-                'pus' => Pu::latest()->get(),
-           ]);
-        }  
+        return view('admin.users.edit', [
+            'user' => $user,
+            'states' => State::latest()->get(),
+            'zones' => Zone::latest()->get(),
+            'lgas' => Lga::latest()->get(),
+            'wards' => Ward::latest()->get(),
+            'pus' => Pu::latest()->get(),
+        ]);
     }
 
     public function update(Request $request, User $user)
@@ -127,7 +106,7 @@ class UsersController extends Controller
             'name' => ['required', 'min:3'],
             'username' => ['required'],
             'email' => ['required', 'email'],
-            'password' => ['required','min:8'],
+            'password' => ['required', 'min:8'],
             'gender' => ['required'],
             'phone' => ['required'],
             'image' => ['required', 'mimes:jpg,png,jpeg'],
@@ -143,8 +122,7 @@ class UsersController extends Controller
         $credentials['password'] = bcrypt($credentials['password']);
 
         //Image Upload
-        if ($request->hasFile('image')) 
-        {
+        if ($request->hasFile('image')) {
             $credentials['image'] = $request->file('image')->store('assets/img/users', 'public');
         }
 
@@ -162,7 +140,7 @@ class UsersController extends Controller
 
     public function profile(User $user)
     {
-        return view('users.profile', [
+        return view('admin.users.profile', [
             'user' => $user,
             'states' => State::latest()->get(),
             'zones' => Zone::latest()->get(),
@@ -193,11 +171,10 @@ class UsersController extends Controller
         ]);
 
         //Image Upload
-        if ($request->hasFile('image')) 
-        {
+        if ($request->hasFile('image')) {
             $credentials['image'] = $request->file('image')->store('assets/img/users', 'public');
         }
-        
+
         if ($user->update($credentials)) {
             return redirect('/admin/profile')->with('success', 'Profile updated Successfully!');
         }
@@ -212,19 +189,17 @@ class UsersController extends Controller
         ]);
 
 
-        if (auth()->attempt(['username' => $user->username, 'password' => $passwords['password']])) 
-        {
+        if (auth()->attempt(['username' => $user->username, 'password' => $passwords['password']])) {
             $password = bcrypt($passwords['newpassword']);
 
             $user->update(['password' => $password]);
 
             return redirect('/admin/profile')->with('success', 'Password updated Successfully!');
         }
-        
-        
+
+
         return redirect('/admin/profile')
-               ->withErrors(['password' => 'Current Password Incorrect'])
-               ->onlyInput('password');
-        
+            ->withErrors(['password' => 'Current Password Incorrect'])
+            ->onlyInput('password');
     }
 }

@@ -12,12 +12,11 @@
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>CVR Panel</h1>
+      <h1>Users Management</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item">CVR Panel</li>
-          <li class="breadcrumb-item active">CVR Logins</li>
+          <li class="breadcrumb-item active">Users</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -25,32 +24,35 @@
     <section class="section dashboard">
       <div class="row">
 
-          <!-- LGA Logins List -->
+          <!-- Users List -->
           <div class="col-12">
             <div class="card recent-sales overflow-auto border-0 shadow-sm">
 
               <div class="card-header bg-transparent border-0 pt-3 pb-0">
                 <div class="d-flex justify-content-between align-items-center">
-                  <h5 class="card-title mb-0 text-dark fw-bold">CVR Logins</h5>
-                  <button id="create-cvr-login" class="btn btn-primary">
-                    <i class="bi bi-person-plus me-1"></i>Create CVR Login
+                  <h5 class="card-title mb-0 text-dark fw-bold">Users List</h5>
+                  {{-- <a href="/admin/users/create" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-1"></i>Create User
+                  </a> --}}
+                  <button type="button" id="createn-user-btn" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-1"></i>Create User
                   </button>
                 </div>
-                <p class="text-muted mt-2 mb-0">Manage LGA Loggins</p>
+                <p class="text-muted mt-2 mb-0">Manage all users in the system</p>
               </div>
 
               <div class="card-body pt-3">
-                <div class="table-responsive" id="cvr-table-container">
+                <div class="table-responsive" id="user-table-container">
                   <table class="table table-hover table-borderless">
                     <thead class="table-light">
                       <tr>
                         <th class="ps-3">#</th>
                         <th>Name</th>
                         <th>Username</th>
-                        <th>Role</th>
                         <th>Email</th>
                         <th>Gender</th>
-                        <th>LGA</th>
+                        <th>Image</th>
+                        <th>Role</th>
                         <th class="text-center pe-3">Actions</th>
                       </tr>
                     </thead>
@@ -61,12 +63,33 @@
                           <td class="ps-3 fw-medium">{{ $sn++ }}</td>
                           <td class="fw-semibold text-dark">{{ $user->name }}</td>
                           <td>{{ $user->username }}</td>
-                          <td>{{ $user->role }}</td>
                           <td>{{ $user->email }}</td>
                           <td>
                             <span class="badge bg-secondary rounded-pill">{{ $user->gender }}</span>
                           </td>
-                          <td>{{ "Bauchi" }}</td>
+                          <td>
+                            <a href="/admin/users/{{ $user->id }}">
+                              <img src="{{ $user->image ? asset('storage/' . $user->image) : asset('assets/img/users/user.jpg') }}" 
+                                   style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;" 
+                                   alt="{{ $user->name }}" 
+                                   title="View {{ $user->name }}">
+                            </a>
+                          </td>
+                          <td>
+                            <span class="badge 
+                              @if(strtolower($user->role->name) === 'user')
+                                bg-warning
+                              @elseif(strtolower($user->role->name) === 'admin')
+                                bg-success
+                              @elseif(strtolower($user->role->name) === 'ratech')
+                                bg-primary
+                              @else
+                                bg-info
+                              @endif  
+                            rounded-pill">
+                              {{ $user->role->name }}
+                            </span>
+                          </td>
                           <td class="text-center pe-3">
                             <div class="btn-group" role="group">
                               <a href="/admin/users/{{ $user->id }}" class="btn btn-sm btn-outline-primary" title="View">
@@ -111,8 +134,7 @@
 
   </main><!-- End #main -->
 
-  @include('cvr.modal')
-
+  @include('admin.users.modal')
 
   <style>
     .table > :not(caption) > * > * {
@@ -131,7 +153,6 @@
   @include('partials.footer')
 @endsection
 
-
 @section('script')
 <script>
 $(document).ready(function() {
@@ -144,26 +165,26 @@ $(document).ready(function() {
   });
 
   // Bootstrap modal instance
-  const cvrModalEl = document.getElementById('cvr-modal');
-  const cvrModal = new bootstrap.Modal(cvrModalEl);
+  const userModalEl = document.getElementById('user-modal');
+  const userModal = new bootstrap.Modal(userModalEl);
 
   // Reset form when modal hides
-  cvrModalEl.addEventListener('hidden.bs.modal', function () {
+  userModalEl.addEventListener('hidden.bs.modal', function () {
       $('#user-form')[0].reset();
       $('#action-btn').html('');
       $('.is-invalid').removeClass('is-invalid');
   });
 
-  $('#create-cvr-login').on('click', function(e) {
+  $('#createn-user-btn').on('click', function(e) {
       e.preventDefault();
-      $('#user-modal-title').text('Create CVR Login');
+      $('#user-modal-title').text('Create User');
 
       $('#action-btn').html(`
-          <button type="submit" class="btn btn-primary" id="submit-user">Save User</button>
+          <button type="submit" class="btn btn-primary" id="submit-user">Submit</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
       `);
 
-      cvrModal.show();
+      userModal.show();
   });
 
   $('#user-form').on('submit', function(e) {
@@ -174,7 +195,7 @@ $(document).ready(function() {
 
     $.ajax({
       type: "POST",
-      url: "/admin/cvr/logins",
+      url: "/admin/states/create",
       data: formData,
       processData: false,
       contentType: false,
@@ -193,16 +214,14 @@ $(document).ready(function() {
     });
   });
 
-
-  // Optional: Populate LGA dynamically based on state
+  // Optional: Populate zones dynamically based on state
   $('#state').on('change', function() {
     const stateId = $(this).val();
-        console.log(stateId);
 
-    $('#lga').html('<option value="">Loading...</option>');
+    $('#zone').html('<option disabled selected value="">Loading...</option>');
 
     if (!stateId) {
-        $('#lga').html('<option value="">Select LGA</option>');
+        $('#zone').html('<option disabled selected value="">Select zone</option>');
         return;
     }
 
@@ -210,9 +229,36 @@ $(document).ready(function() {
       url: `/admin/states/${stateId}`,
       dataType: 'json',  
       success: function(data) {
-          let options = '<option value="">Select LGA</option>';
+          let options = '<option value="">Select zone</option>';
 
-          data.state.lgas.forEach(lga => {
+          data.state.zones.forEach(zone => {
+              options += `<option value="${zone.id}">${zone.name}</option>`;
+          });
+
+          $('#zone').html(options);
+      }
+    });
+  });
+
+  // Optional: Populate LGA dynamically based on state
+  $('#zone').on('change', function() {
+    const zoneId = $(this).val();
+
+    $('#lga').html('<option value="">Loading...</option>');
+
+    if (!zoneId) {
+        $('#lga').html('<option disabled selected value="">Select LGA</option>');
+        return;
+    }
+
+    $.get({
+      url: `/admin/zones/${zoneId}`,
+      dataType: 'json',  
+      success: function(data) {
+          let options = '<option disabled selected value="">Select LGA</option>';
+console.log("Zone: ", data.zone);
+
+          data.zone.lgas.forEach(lga => {
               options += `<option value="${lga.id}">${lga.name}</option>`;
           });
 
@@ -227,10 +273,10 @@ $(document).ready(function() {
         dataType: 'json',
         success: function(data) {
 
-            let options = `<option value="">Select type</option>`;
+            let options = `<option disabled selected value="">Select role</option>`;
 
             data.roles
-                .filter(role => role.name.toLowerCase().includes('coodinator'))
+                .filter(role => !role.name?.toLowerCase().includes('coodinator'))
                 .forEach(role => {
 
                     let displayName = role.name
@@ -248,44 +294,52 @@ $(document).ready(function() {
 
   function handleResponse(response) {
     const errors = response.errors || {};
+
     const errorMapping = {
       name: '#name-error',
       username: '#username-error',
       email: '#email-error',
+      phone: '#phone-error',
       password: '#password-error',
       gender: '#gender-error',
-      phone: '#phone-error',
       role_id: '#role-error',
       state_id: '#state-error',
+      zone_id: '#zone-error',
       lga_id: '#lga-error',
+      ward_id: '#ward-error',
+      pu_id: '#pu-error',
     };
 
+    // Clear all previous errors
     $('.is-invalid').removeClass('is-invalid');
-    $('.invalid-feedback').text('');
+    $('.invalid-feedback').text('').hide();
 
+    // Apply new errors
     $.each(errorMapping, (key, feedbackElement) => {
-        const errorMessage = errors[key];
-        if (errorMessage) {
-          $(`#${key}`).addClass('is-invalid');
+      const errorMessage = errors[key];
+      if (errorMessage) {
+        $(`#${key}`).addClass('is-invalid');
 
-          $(feedbackElement)
-              .text(errorMessage[0])
-              .css('display', 'block'); // force display
-        }
+        $(feedbackElement)
+          .text(errorMessage[0])
+          .css('display', 'block');
+      }
     });
 
+    // Image upload errors (if any)
     if (errors.image) {
-        toastr.error(errors.image[0], 'Error');
+      toastr.error(errors.image[0], 'Error');
     }
 
+    // Success handling
     if (response.status) {
-      cvrModal.hide();
+      $('#user-modal').modal('hide'); // Hide modal
       toastr.success(response.message, 'Success');
-      // $("#cvr-table").DataTable().ajax.reload();
-      $("#cvr-table-container").load(location.href + " #cvr-table-container > *");
-    }
-}
 
+      // Reload table container
+      $("#user-table-container").load(location.href + " #user-table-container > *");
+    }
+  }
 });
 </script>
 @endsection

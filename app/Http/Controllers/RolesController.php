@@ -9,7 +9,7 @@ class RolesController extends Controller
     public function index()
     {
         return response()->json([
-            'roles' => Role::all()
+            'roles' => Role::withoutSuper()->get()
         ]);
     }
 }
