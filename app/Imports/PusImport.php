@@ -7,7 +7,6 @@ use App\Models\Zone;
 use App\Models\Lga;
 use App\Models\Ward;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -17,6 +16,7 @@ class PusImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
+
             // -------------------------------
             // BASIC VALIDATION
             // -------------------------------
@@ -24,11 +24,10 @@ class PusImport implements ToCollection, WithHeadingRow
                 empty($row['state']) ||
                 empty($row['zone']) ||
                 empty($row['lga']) ||
-                empty($row['ra']) ||      // Changed from 'ward' to 'ra'
-                empty($row['pu']) ||       // Changed from 'name' to 'pu'
-                empty($row['delim'])       // Changed from 'number' to 'delim'
+                empty($row['ra']) ||
+                empty($row['pu']) ||
+                empty($row['delim'])
             ) {
-                Log::warning('PU import skipped: missing required fields', $row->toArray());
                 continue;
             }
 
@@ -38,62 +37,59 @@ class PusImport implements ToCollection, WithHeadingRow
             $stateName = Str::title(trim($row['state']));
             $zoneName  = Str::title(trim($row['zone']));
             $lgaName   = Str::title(trim($row['lga']));
-            $wardName  = Str::title(trim($row['ra']));     // RA is the Ward/Registration Area
-            $puName    = Str::title(trim($row['pu']));     // PU column contains the name
-            $puNumber  = trim($row['delim']);              // DELIM contains the PU number
+            $wardName  = Str::title(trim($row['ra']));
+            $puName    = Str::title(trim($row['pu']));
+            $puNumber  = trim($row['delim']);
 
             // -------------------------------
-            // FETCH STATE
+            // STATE (CREATE OR UPDATE)
             // -------------------------------
-            $state = State::where('name', $stateName)->first();
-            if (! $state) {
-                Log::warning("PU import skipped: State not found ({$stateName})", $row->toArray());
-                continue;
-            }
+            $state = State::updateOrCreate(
+                ['name' => $stateName],
+                ['name' => $stateName]
+            );
 
             // -------------------------------
-            // FETCH ZONE (SCOPED TO STATE)
+            // ZONE (SCOPED TO STATE)
             // -------------------------------
-            $zone = Zone::where('name', $zoneName)
-                ->where('state_id', $state->id)
-                ->first();
-
-            if (! $zone) {
-                Log::warning("PU import skipped: Zone not found ({$zoneName})", $row->toArray());
-                continue;
-            }
-
-            // -------------------------------
-            // FETCH LGA (SCOPED TO ZONE)
-            // -------------------------------
-            $lga = Lga::where('name', $lgaName)
-                ->where('zone_id', $zone->id)
-                ->first();
-
-            if (! $lga) {
-                Log::warning("PU import skipped: LGA not found ({$lgaName})", $row->toArray());
-                continue;
-            }
+            $zone = $state->zones()->updateOrCreate(
+                ['name' => $zoneName],
+                [
+                    'name' => $zoneName,
+                    'state_id' => $state->id
+                ]
+            );
 
             // -------------------------------
-            // FETCH WARD (SCOPED TO LGA)
+            // LGA (SCOPED TO ZONE)
             // -------------------------------
-            $ward = Ward::where('name', $wardName)
-                ->where('lga_id', $lga->id)
-                ->first();
-
-            if (! $ward) {
-                Log::warning("PU import skipped: Ward not found ({$wardName})", $row->toArray());
-                continue;
-            }
+            $lga = $zone->lgas()->updateOrCreate(
+                ['name' => $lgaName],
+                [
+                    'name' => $lgaName,
+                    'state_id' => $state->id,
+                    'zone_id' => $zone->id,
+                ]
+            );
 
             // -------------------------------
-            // CREATE OR UPDATE PU
+            // WARD (SCOPED TO LGA)
+            // -------------------------------
+            $ward = $lga->wards()->updateOrCreate(
+                ['name' => $wardName],
+                [
+                    'name' => $wardName,
+                    'state_id' => $state->id,
+                    'zone_id' => $zone->id,
+                    'lga_id' => $lga->id,
+                ]
+            );
+
+            // -------------------------------
+            // PU (SCOPED TO WARD)
             // -------------------------------
             $ward->pus()->updateOrCreate(
-                [
-                    'number' => $puNumber,
-                ],
+                ['number' => $puNumber],
                 [
                     'name'     => $puName,
                     'state_id' => $state->id,

@@ -194,7 +194,6 @@ $(document).ready(function() {
   });
 
 
-  // Optional: Populate LGA dynamically based on state
   $('#state').on('change', function() {
     const stateId = $(this).val();
         console.log(stateId);
@@ -230,7 +229,7 @@ $(document).ready(function() {
             let options = `<option value="">Select type</option>`;
 
             data.roles
-                .filter(role => role.name.toLowerCase().includes('coodinator'))
+                .filter(role => role.name.toLowerCase().includes('coordinator'))
                 .forEach(role => {
 
                     let displayName = role.name
@@ -270,7 +269,7 @@ $(document).ready(function() {
 
           $(feedbackElement)
               .text(errorMessage[0])
-              .css('display', 'block'); // force display
+              .css('display', 'block'); 
         }
     });
 
@@ -281,7 +280,6 @@ $(document).ready(function() {
     if (response.status) {
       cvrModal.hide();
       toastr.success(response.message, 'Success');
-      // $("#cvr-table").DataTable().ajax.reload();
       $("#cvr-table-container").load(location.href + " #cvr-table-container > *");
     }
 }
