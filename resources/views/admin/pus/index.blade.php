@@ -59,18 +59,18 @@
                         <tr class="border-bottom">
                           <td class="ps-3 fw-medium">{{ $sn++ }}</td>
                           <td class="fw-semibold text-primary">{{ $pu->number }}</td>
-                          <td class="fw-semibold text-dark">{{ $pu?->name ?? 'N/A' }}</td>
+                          <td class="fw-semibold text-dark">{{ $pu?->name }}</td>
                           <td>
-                            <span class="badge bg-secondary rounded-pill">{{ $pu->state->name }}</span>
+                            <span class="badge bg-secondary rounded-pill">{{ $pu->state?->name }}</span>
                           </td>
                           <td>
-                            <span class="badge bg-primary rounded-pill">{{ $pu->zone->name }}</span>
+                            <span class="badge bg-primary rounded-pill">{{ $pu->zone?->name }}</span>
                           </td>
                           <td>
-                            <span class="badge bg-success rounded-pill">{{ $pu->lga->name }}</span>
+                            <span class="badge bg-success rounded-pill">{{ $pu->lga?->name }}</span>
                           </td>
                           <td>
-                            <span class="badge bg-info rounded-pill">{{ $pu->ward->name }}</span>
+                            <span class="badge bg-info rounded-pill">{{ $pu->ward?->name }}</span>
                           </td>
                           <td>
                             <span class="badge bg-danger rounded-pill">{{ count($pu->users) }}</span>
