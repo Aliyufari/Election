@@ -5,7 +5,7 @@
 @endsection
 
 @section('sidebar')
-  @include('partials.sidebar')
+  @include('partials.admin.sidebar')
 @endsection
 
 @section('content')
@@ -50,7 +50,7 @@
                             <img src="{{ $result->image ? asset('storage/' . $result->image) : asset('assets/img/results/result.jpg')}}" style="max-width:40px; max-height:40px;" alt="" title="{{ $result->pu->name }} Result">
                           </td>
                           <td scope="row" style="display: flex; align-content: flex-start; justify-content: space-between;">
-                            <a href="/results/{{ $result->pu_id }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-binoculars"></i> View</a>
+                            <a href="/admin/results/{{ $result->id }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-binoculars"></i> View</a>
 
                             <a href="/admin/results/{{ $result->id }}/edit" class="btn btn-sm btn-success"><i class="bi bi-pencil-square"></i> Edit</a>
 

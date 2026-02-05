@@ -5,7 +5,7 @@
 @endsection
 
 @section('sidebar')
-  @include('partials.sidebar')
+  @include('partials.admin.sidebar')
 @endsection
 
 @section('content')
@@ -58,7 +58,7 @@
                     </thead>
                     <tbody>
                     @foreach($users as $user)
-                      @if(strtolower($user->role) !== 'super')
+                      @if(strtolower($user->role->name) !== 'super')
                         <tr class="border-bottom">
                           <td class="ps-3 fw-medium">{{ $sn++ }}</td>
                           <td class="fw-semibold text-dark">{{ $user->name }}</td>
@@ -155,193 +155,190 @@
 
 @section('script')
 <script>
-$(document).ready(function() {
+$(document).ready(function () {
 
-  // CSRF setup
   $.ajaxSetup({
-      headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      }
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
   });
 
-  // Bootstrap modal instance
   const userModalEl = document.getElementById('user-modal');
   const userModal = new bootstrap.Modal(userModalEl);
 
-  // Reset form when modal hides
   userModalEl.addEventListener('hidden.bs.modal', function () {
-      $('#user-form')[0].reset();
-      $('#action-btn').html('');
-      $('.is-invalid').removeClass('is-invalid');
+    $('#user-form')[0].reset();
+    $('#action-btn').html('');
+    $('.is-invalid').removeClass('is-invalid');
+    $('.invalid-feedback').text('').hide();
   });
 
-  $('#createn-user-btn').on('click', function(e) {
-      e.preventDefault();
-      $('#user-modal-title').text('Create User');
+  $('#createn-user-btn').on('click', function (e) {
+    e.preventDefault();
 
-      $('#action-btn').html(`
-          <button type="submit" class="btn btn-primary" id="submit-user">Submit</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      `);
+    $('#user-modal-title').text('Create User');
 
-      userModal.show();
+    $('#action-btn').html(`
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    `);
+
+    userModal.show();
   });
 
-  $('#user-form').on('submit', function(e) {
+  $('#user-form').on('submit', function (e) {
     e.preventDefault();
 
     const formData = new FormData(this);
-    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
 
     $.ajax({
-      type: "POST",
-      url: "/admin/states/create",
+      type: 'POST',
+      url: '/admin/users',
       data: formData,
       processData: false,
       contentType: false,
       dataType: 'json',
-      success: function(response) {
-          handleResponse(response);
-      },
-      error: function(xhr) {
-          if (xhr.status === 422) {
-              const response = xhr.responseJSON;
-              handleResponse(response); 
-          } else {
-              toastr.error('Something went wrong', 'Error');
-          }
+      success: handleResponse,
+      error: function (xhr) {
+        if (xhr.responseJSON) {
+          handleResponse(xhr.responseJSON);
+        } else {
+          toastr.error('Server error', 'Error');
+        }
       }
     });
   });
 
-  // Optional: Populate zones dynamically based on state
-  $('#state').on('change', function() {
+  $('#state').on('change', function () {
     const stateId = $(this).val();
 
-    $('#zone').html('<option disabled selected value="">Loading...</option>');
+    $('#zone').html('<option disabled selected>Loading...</option>');
+    $('#lga, #ward, #pu').html('<option disabled selected>Select</option>');
 
-    if (!stateId) {
-        $('#zone').html('<option disabled selected value="">Select zone</option>');
-        return;
-    }
+    if (!stateId) return;
 
-    $.get({
-      url: `/admin/states/${stateId}`,
-      dataType: 'json',  
-      success: function(data) {
-          let options = '<option value="">Select zone</option>';
+    $.get(`/admin/states/${stateId}`, function (data) {
+      let options = '<option disabled selected>Select zone</option>';
 
-          data.state.zones.forEach(zone => {
-              options += `<option value="${zone.id}">${zone.name}</option>`;
-          });
+      data.state.zones.forEach(zone => {
+        options += `<option value="${zone.id}">${zone.name}</option>`;
+      });
 
-          $('#zone').html(options);
-      }
+      $('#zone').html(options);
     });
   });
 
-  // Optional: Populate LGA dynamically based on state
-  $('#zone').on('change', function() {
+  $('#zone').on('change', function () {
     const zoneId = $(this).val();
 
-    $('#lga').html('<option value="">Loading...</option>');
+    $('#lga').html('<option disabled selected>Loading...</option>');
+    $('#ward, #pu').html('<option disabled selected>Select</option>');
 
-    if (!zoneId) {
-        $('#lga').html('<option disabled selected value="">Select LGA</option>');
-        return;
-    }
+    if (!zoneId) return;
 
-    $.get({
-      url: `/admin/zones/${zoneId}`,
-      dataType: 'json',  
-      success: function(data) {
-          let options = '<option disabled selected value="">Select LGA</option>';
-console.log("Zone: ", data.zone);
+    $.get(`/admin/zones/${zoneId}`, function (data) {
+      let options = '<option disabled selected>Select LGA</option>';
 
-          data.zone.lgas.forEach(lga => {
-              options += `<option value="${lga.id}">${lga.name}</option>`;
-          });
+      data.zone.lgas.forEach(lga => {
+        options += `<option value="${lga.id}">${lga.name}</option>`;
+      });
 
-          $('#lga').html(options);
-      }
+      $('#lga').html(options);
+    });
+  });
+
+  $('#lga').on('change', function () {
+    const lgaId = $(this).val();
+
+    $('#ward').html('<option disabled selected>Loading...</option>');
+    $('#pu').html('<option disabled selected>Select</option>');
+
+    if (!lgaId) return;
+
+    $.get(`/admin/lgas/${lgaId}`, function (data) {
+      let options = '<option disabled selected>Select ward</option>';
+
+      data.lga.wards.forEach(ward => {
+        options += `<option value="${ward.id}">${ward.name}</option>`;
+      });
+
+      $('#ward').html(options);
+    });
+  });
+
+  $('#ward').on('change', function () {
+    const wardId = $(this).val();
+
+    $('#pu').html('<option disabled selected>Loading...</option>');
+
+    if (!wardId) return;
+
+    $.get(`/admin/wards/${wardId}`, function (data) {
+      let options = '<option disabled selected>Select PU</option>';
+
+      data.ward.pus.forEach(pu => {
+        options += `<option value="${pu.id}">${pu.name}</option>`;
+      });
+
+      $('#pu').html(options);
     });
   });
 
   const getRoles = () => {
-    $.get({
-        url: '/admin/roles',
-        dataType: 'json',
-        success: function(data) {
+    $.get('/admin/roles', function (data) {
+      let options = '<option disabled selected>Select role</option>';
 
-            let options = `<option disabled selected value="">Select role</option>`;
+      data.roles
+        .filter(role => !role.name?.toLowerCase().includes('coodinator'))
+        .forEach(role => {
+          const label = role.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          options += `<option value="${role.id}">${label}</option>`;
+        });
 
-            data.roles
-                .filter(role => !role.name?.toLowerCase().includes('coodinator'))
-                .forEach(role => {
-
-                    let displayName = role.name
-                      .replace(/_/g, " ")        
-                      .replace(/\b\w/g, c => c.toUpperCase()); 
-
-                    options += `<option value="${role.id}">${displayName}</option>`;
-                });
-
-            $("#role").html(options);
-        }
+      $('#role').html(options);
     });
-  }
-  getRoles()
+  };
+
+  getRoles();
 
   function handleResponse(response) {
-    const errors = response.errors || {};
-
-    const errorMapping = {
-      name: '#name-error',
-      username: '#username-error',
-      email: '#email-error',
-      phone: '#phone-error',
-      password: '#password-error',
-      gender: '#gender-error',
-      role_id: '#role-error',
-      state_id: '#state-error',
-      zone_id: '#zone-error',
-      lga_id: '#lga-error',
-      ward_id: '#ward-error',
-      pu_id: '#pu-error',
-    };
-
-    // Clear all previous errors
     $('.is-invalid').removeClass('is-invalid');
     $('.invalid-feedback').text('').hide();
 
-    // Apply new errors
-    $.each(errorMapping, (key, feedbackElement) => {
-      const errorMessage = errors[key];
-      if (errorMessage) {
-        $(`#${key}`).addClass('is-invalid');
+    if (response.errors) {
+      Object.keys(response.errors).forEach(field => {
+        const messages = response.errors[field];
 
-        $(feedbackElement)
-          .text(errorMessage[0])
-          .css('display', 'block');
-      }
-    });
+        const input = $(`#${field}`);
+        if (input.length) {
+          input.addClass('is-invalid');
+        }
 
-    // Image upload errors (if any)
-    if (errors.image) {
-      toastr.error(errors.image[0], 'Error');
+        const feedback = $(`#${field}-error`);
+        if (feedback.length) {
+          feedback.text(messages[0]).show();
+        }
+      });
+
+      return; 
     }
 
-    // Success handling
-    if (response.status) {
-      $('#user-modal').modal('hide'); // Hide modal
-      toastr.success(response.message, 'Success');
+    if (response.status === true) {
+      $('#user-modal').modal('hide');
+      toastr.success(response.message || 'Saved successfully', 'Success');
 
-      // Reload table container
-      $("#user-table-container").load(location.href + " #user-table-container > *");
+      $('#user-table-container').load(
+        location.href + ' #user-table-container > *'
+      );
+
+      return;
     }
+
+    toastr.error('Unexpected server response', 'Error');
   }
 });
 </script>
+
 @endsection
 
 @section('toast')

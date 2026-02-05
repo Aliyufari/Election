@@ -13,4 +13,9 @@ class DashboardController extends Controller
     {
         return view('admin.dashboard', []);
     }
+
+    public function coordinator()
+    {
+        return view('coordinators.dashboard', []);
+    }
 }

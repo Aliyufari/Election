@@ -10,11 +10,11 @@ class Ward extends Model
     use HasFactory;
 
     protected $fillable = [
-     'name',
-     'state_id',
-     'zone_id',
-     'lga_id',
-     'description',
+        'name',
+        'state_id',
+        'zone_id',
+        'lga_id',
+        'description',
     ];
 
     public function users()
@@ -40,5 +40,10 @@ class Ward extends Model
     public function pus()
     {
         return $this->hasMany(Pu::class);
+    }
+
+    public function voters()
+    {
+        return $this->hasMany(Voter::class);
     }
 }

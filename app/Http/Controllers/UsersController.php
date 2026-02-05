@@ -60,30 +60,36 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $credentials = $request->validate([
-            'name' => ['required', 'min:3'],
-            'username' => ['required', Rule::unique('users', 'username')],
-            'email' => ['required', 'email', Rule::unique('users', 'email')],
+            'name'     => ['required', 'string', 'min:3', 'max:255'],
+            'username' => ['required', 'string', 'min:3', 'max:50', Rule::unique('users', 'username')],
+            'email'    => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
+            'gender'   => ['required', 'in:male,female'],
+            'phone'    => ['required', 'string', 'max:20'],
+            'image'    => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'role_id'  => ['required', 'exists:roles,id'],
+            'state_id' => ['required', 'exists:states,id'],
+            'zone_id'  => ['required', 'exists:zones,id'],
+            'lga_id'   => ['required', 'exists:lgas,id'],
+            'ward_id'  => ['required', 'exists:wards,id'],
+            'pu_id'    => ['required', 'exists:pus,id'],
             'password' => ['required', 'min:8'],
-            'gender' => ['required'],
-            'phone' => ['required'],
-            'image' => ['required', 'mimes:jpg,png,jpeg'],
-            'role' => ['required'],
-            'state_id' => ['required'],
-            'zone_id' => ['required'],
-            'lga_id' => ['required'],
-            'ward_id' => ['required'],
-            'pu_id' => ['required'],
         ]);
 
-        //Hash Password
         $credentials['password'] = bcrypt($credentials['password']);
 
-        //Image Upload
         if ($request->hasFile('image')) {
             $credentials['image'] = $request->file('image')->store('assets/img/users', 'public');
         }
 
-        User::create($credentials);
+        $user = User::create($credentials);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'User created successfully',
+                'data'    => $user->load('role'),
+            ]);
+        }
 
         return redirect('/admin/users')->with('success', 'User created successfully!');
     }

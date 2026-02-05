@@ -4,7 +4,7 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link {{ request()->is('/') ? 'active' : 'collapsed' }}" href="/">
+        <a class="nav-link {{ request()->is('/admin') ? 'active' : 'collapsed' }}" href="/admin">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>

@@ -37,13 +37,6 @@ class ResultsController extends Controller
     {
         return view('admin.results.show', [
             'result' => $result,
-            'results' => $result->latest()->paginate(10),
-            'election' => request('name'),
-            'elections' => Election::latest()->get(),
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
         ]);
     }
 

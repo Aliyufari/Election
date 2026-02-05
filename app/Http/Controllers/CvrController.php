@@ -11,6 +11,7 @@ use App\Models\Zone;
 use App\Models\State;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
+use App\Models\Voter;
 use Illuminate\Support\Facades\Validator;
 
 class CvrController extends Controller
@@ -155,16 +156,52 @@ class CvrController extends Controller
         ]);
     }
 
-    public function voters()
+    public function voters(Request $request)
     {
-        return view('admin.cvr.voters', [
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
-            'sn' => 1,
-        ]);
+        $query = State::with('zones', 'lgas', 'wards.voters', 'pus', 'users')->latest();
+
+        // Apply filters if request has parameters
+        if ($request->state_id) {
+            $query->where('id', $request->state_id);
+        }
+
+        $states = $query->get();
+
+        // Filter wards if needed
+        if ($request->ward_id) {
+            foreach ($states as $state) {
+                $state->wards = $state->wards->where('id', $request->ward_id)->values();
+            }
+        }
+
+        // Calculate first and second phase totals
+        $firstPhaseTotalVoters = 0;
+        $secondPhaseTotalVoters = 0;
+
+        foreach ($states as $state) {
+            foreach ($state->wards as $ward) {
+                foreach ($ward->voters as $voter) {
+                    $firstPhaseTotalVoters += $voter->first_phase_figure ?? 0;
+                    $secondPhaseTotalVoters += $voter->second_phase_figure ?? 0;
+                }
+            }
+        }
+
+        // If it's an AJAX request, return JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'states' => $states,
+                'first_phase_total' => $firstPhaseTotalVoters,
+                'second_phase_total' => $secondPhaseTotalVoters,
+            ]);
+        }
+
+        // Normal page load
+        return view('admin.cvr.voters', compact(
+            'states',
+            'firstPhaseTotalVoters',
+            'secondPhaseTotalVoters'
+        ));
     }
 
     public function logins()
@@ -305,6 +342,71 @@ class CvrController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'CVRs added successfully.',
+        ]);
+    }
+
+    public function updateFigure(Request $request)
+    {
+        $validated = $request->validate([
+            'type'    => 'required|in:first_phase,second_phase',
+            'value'   => 'required|integer|min:0',
+            'ward_id' => 'required|exists:wards,id',
+        ]);
+
+        // Either get existing voter record for the ward or create it
+        $voter = Voter::firstOrCreate(
+            ['ward_id' => $validated['ward_id']],
+            [
+                'first_phase_figure'  => 0,
+                'second_phase_figure' => 0,
+            ]
+        );
+
+        // Decide which column to update
+        if ($validated['type'] === 'first_phase') {
+            $voter->update([
+                'first_phase_figure' => $validated['value'],
+            ]);
+        } else {
+            $voter->update([
+                'second_phase_figure' => $validated['value'],
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'CVR figure updated successfully',
+        ]);
+    }
+
+    public function filter(Request $request)
+    {
+        $query = State::with('zones', 'lgas', 'wards.voters', 'pus');
+
+        if ($request->state_id) {
+            $query->where('id', $request->state_id);
+        }
+
+        $states = $query->get();
+
+        // Filter wards if ward_id is set
+        if ($request->ward_id) {
+            foreach ($states as $state) {
+                $state->wards = $state->wards->where('id', $request->ward_id)->values();
+            }
+        }
+
+        // Calculate total voters
+        $totalVoters = 0;
+        foreach ($states as $state) {
+            foreach ($state->wards as $ward) {
+                $totalVoters += $ward->voters->count();
+            }
+        }
+
+        return response()->json([
+            'states' => $states,
+            'total_voters' => $totalVoters,
         ]);
     }
 }

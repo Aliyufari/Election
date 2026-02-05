@@ -5,7 +5,7 @@
 @endsection
 
 @section('sidebar')
-  @include('partials.sidebar')
+  @include('partials.admin.sidebar')
 @endsection
 
 @section('content')
@@ -35,15 +35,15 @@
               <ul class="nav nav-tabs nav-tabs-bordered">
 
                 <li class="nav-item">
-                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">{{$election}}</button>
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">{{$result->election->name}}</button>
                 </li>
 
               </ul>
               <div class="row">
                 <div class="col-xl-12 m-3">
-                  <h6 class="fw-bold">{{$result->pu->name}} - Rsut View</h6>
+                  <h6 class="fw-bold">{{$result->pu->number}} - Rsut View</h6>
                 </div>
-                @if($result->pu->id === $result->pu_id)
+                @if($result->image)
                  <div class="col-xl-12 m-3e">
                       <img src="{{asset('storage/' . $result->image)}}" class="img-fluid">
                   </div>
