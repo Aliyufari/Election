@@ -111,12 +111,12 @@
               </div>
 
             </div>
-          </div><!-- End PUs List -->
+          </div>
 
       </div>
     </section>
 
-  </main><!-- End #main -->
+  </main>
 
   <style>
     .table > :not(caption) > * > * {
