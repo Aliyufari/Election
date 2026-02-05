@@ -17,17 +17,16 @@ class PusImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-
             // -------------------------------
             // BASIC VALIDATION
             // -------------------------------
             if (
-                empty($row['name']) ||
-                empty($row['number']) ||
                 empty($row['state']) ||
                 empty($row['zone']) ||
                 empty($row['lga']) ||
-                empty($row['ward'])
+                empty($row['ra']) ||      // Changed from 'ward' to 'ra'
+                empty($row['pu']) ||       // Changed from 'name' to 'pu'
+                empty($row['delim'])       // Changed from 'number' to 'delim'
             ) {
                 Log::warning('PU import skipped: missing required fields', $row->toArray());
                 continue;
@@ -39,15 +38,14 @@ class PusImport implements ToCollection, WithHeadingRow
             $stateName = Str::title(trim($row['state']));
             $zoneName  = Str::title(trim($row['zone']));
             $lgaName   = Str::title(trim($row['lga']));
-            $wardName  = Str::title(trim($row['ward']));
-            $puName    = Str::title(trim($row['name']));
-            $puNumber  = trim($row['number']);
+            $wardName  = Str::title(trim($row['ra']));     // RA is the Ward/Registration Area
+            $puName    = Str::title(trim($row['pu']));     // PU column contains the name
+            $puNumber  = trim($row['delim']);              // DELIM contains the PU number
 
             // -------------------------------
             // FETCH STATE
             // -------------------------------
             $state = State::where('name', $stateName)->first();
-
             if (! $state) {
                 Log::warning("PU import skipped: State not found ({$stateName})", $row->toArray());
                 continue;
@@ -92,7 +90,7 @@ class PusImport implements ToCollection, WithHeadingRow
             // -------------------------------
             // CREATE OR UPDATE PU
             // -------------------------------
-            $ward->pus()->firstOrCreate(
+            $ward->pus()->updateOrCreate(
                 [
                     'number' => $puNumber,
                 ],
