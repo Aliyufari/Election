@@ -59,7 +59,7 @@
                         <tr class="border-bottom">
                           <td class="ps-3 fw-medium">{{ $sn++ }}</td>
                           <td class="fw-semibold text-primary">{{ $pu->number }}</td>
-                          <td class="fw-semibold text-dark">{{ $pu->name }}</td>
+                          <td class="fw-semibold text-dark">{{ $pu?->name ?? 'N/A' }}</td>
                           <td>
                             <span class="badge bg-secondary rounded-pill">{{ $pu->state->name }}</span>
                           </td>
