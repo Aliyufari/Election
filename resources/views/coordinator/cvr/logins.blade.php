@@ -5,7 +5,7 @@
 @endsection
 
 @section('sidebar')
-  @include('partials.admin.sidebar')
+  @include('partials.coordinator.sidebar')
 @endsection
 
 @section('content')
@@ -69,13 +69,13 @@
                           <td>{{ "Bauchi" }}</td>
                           <td class="text-center pe-3">
                             <div class="btn-group" role="group">
-                              <a href="/admin/users/{{ $user->id }}" class="btn btn-sm btn-outline-primary" title="View">
+                              <a href="/coordinator/users/{{ $user->id }}" class="btn btn-sm btn-outline-primary" title="View">
                                 <i class="bi bi-eye"></i>
                               </a>
-                              <a href="/admin/users/{{ $user->id }}/edit" class="btn btn-sm btn-outline-success" title="Edit">
+                              <a href="/coordinator/users/{{ $user->id }}/edit" class="btn btn-sm btn-outline-success" title="Edit">
                                 <i class="bi bi-pencil"></i>
                               </a>
-                              <form method="POST" action="/admin/users/{{ $user->id }}" class="d-inline">
+                              <form method="POST" action="/coordinator/users/{{ $user->id }}" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this user?')">
@@ -111,7 +111,7 @@
 
   </main><!-- End #main -->
 
-  @include('admin.cvr.modal')
+  @include('coordinator.cvr.modal')
 
 
   <style>
@@ -186,10 +186,6 @@ $(document).ready(function () {
 
     if (!roleName) return;
 
-    if (roleName.includes('state_coordinator')) {
-        showField('#state-wrapper');
-    }
-
     if (roleName.includes('zonal_coordinator')) {
         showField('#state-wrapper');
         showField('#zone-wrapper');
@@ -217,9 +213,9 @@ $(document).ready(function () {
   /* ---------------- FETCH ROLES ---------------- */
 
   function getRoles() {
-    $.get('/admin/roles', function (data) {
+    $.get('/coordinator/roles', function (data) {
 
-      let options = `<option value="">Select type</option>`;
+      let options = `<option value="">Select role</option>`;
 
       data.roles
         .filter(role => role.name.includes('coordinator'))
@@ -252,7 +248,7 @@ $(document).ready(function () {
       return;
     }
 
-    $.get(`/admin/states/${stateId}`, function (data) {
+    $.get(`/coordinator/states/${stateId}`, function (data) {
       let options = '<option value="">Select zone</option>';
       data.state.zones.forEach(zone => {
         options += `<option value="${zone.id}">${zone.name}</option>`;
@@ -265,6 +261,7 @@ $(document).ready(function () {
 
   $('#zone').on('change', function () {
     const zoneId = $(this).val();
+
     $('#lga').html('<option value="">Loading...</option>');
     $('#ward').html('<option value="">Select Ward</option>');
 
@@ -273,7 +270,9 @@ $(document).ready(function () {
       return;
     }
 
-    $.get(`/admin/zones/${zoneId}`, function (data) {
+    $.get(`/coordinator/zones/${zoneId}`, function (data) {
+      console.log(data);
+      
       let options = '<option value="">Select LGA</option>';
       data.zone.lgas.forEach(lga => {
         options += `<option value="${lga.id}">${lga.name}</option>`;
@@ -293,7 +292,7 @@ $(document).ready(function () {
       return;
     }
 
-    $.get(`/admin/lgas/${lgaId}`, function (data) {
+    $.get(`/coordinator/lgas/${lgaId}`, function (data) {
       let options = '<option value="">Select Ward</option>';
       data.lga.wards.forEach(ward => {
         options += `<option value="${ward.id}">${ward.name}</option>`;
@@ -311,7 +310,7 @@ $(document).ready(function () {
 
     $.ajax({
       type: 'POST',
-      url: '/admin/cvr/logins',
+      url: '/coordinator/cvr/logins',
       data: formData,
       processData: false,
       contentType: false,
@@ -352,7 +351,6 @@ $(document).ready(function () {
 });
 </script>
 @endsection
-
 
 @section('toast')
   @include('partials.toast')

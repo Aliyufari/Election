@@ -5,7 +5,7 @@
 @endsection
 
 @section('sidebar')
-  @include('partials.coordinators.sidebar')
+  @include('partials.coordinator.sidebar')
 @endsection
 
 @section('content')
@@ -110,7 +110,7 @@
 
                         <div class="col-md-3 text-md-end mt-3 mt-md-0">
                           <a
-                            href="/coordinators/states/{{ $state->id }}/zones/{{ $zone->id }}/cvr"
+                            href="/coordinator/states/{{ $state->id }}/zones/{{ $zone->id }}/cvr"
                             class="btn btn-outline-primary btn-sm px-3">
                             <i class="bi bi-eye me-1"></i>
                             View CVRs

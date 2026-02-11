@@ -20,7 +20,7 @@ class CvrController extends Controller
     {
         $states = State::with('zones', 'lgas', 'wards', 'pus', 'users')->paginate(10);
         return view('admin.cvr.index', [
-            'cvrs' => Cvr::with('pu')->paginate(10),
+            'cvrs' => Cvr::with('pu', 'createdBy')->paginate(10),
             'states' => $states
         ]);
     }
@@ -50,12 +50,13 @@ class CvrController extends Controller
             'type'      => $request->type,
             'pu_id'     => $request->pu_id,
             'status'    => $request->status,
+            'user_id'   => auth()->id(),
         ]);
 
         return response()->json([
             'status'  => true,
             'message' => 'CVR created successfully',
-            'data'    => $cvr->load('pu.ward'),
+            'data'    => $cvr->load('pu.ward', 'createdBy'),
         ]);
     }
 
@@ -65,10 +66,6 @@ class CvrController extends Controller
 
         return view('admin.cvr.states', [
             'states' => $states,
-            // 'zones' => Zone::latest()->get(),
-            // 'lgas' => Lga::latest()->get(),
-            // 'wards' => Ward::latest()->get(),
-            // 'pus' => Pu::latest()->get(),
             'sn' => 1,
         ]);
     }
@@ -206,13 +203,14 @@ class CvrController extends Controller
 
     public function logins()
     {
-
         return view('admin.cvr.logins', [
             'users' => User::with('role')
                 ->whereHas('role', function ($query) {
                     $query->whereIn('name', [
-                        'state_coodinator',
-                        'lga_coodinator'
+                        'state_coordinator',
+                        'zonal_coordinator',
+                        'lga_coordinator',
+                        'ward_coordinator'
                     ]);
                 })
                 ->latest()

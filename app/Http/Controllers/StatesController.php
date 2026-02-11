@@ -19,11 +19,17 @@ class StatesController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(State $state)
+    public function index()
     {
+        if (request()->expectsJson()) {
+            return response()->json([
+                'states' => State::latest()->get(),
+            ]);
+        }
+
         return view('admin.states.index', [
-            'states' => $state->paginate(10),
-            'sn' => 1,
+            'states' => State::latest()->paginate(10),
+            'sn'     => 1,
         ]);
     }
 

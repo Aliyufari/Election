@@ -5,7 +5,7 @@
 @endsection
 
 @section('sidebar')
-  @include('partials.coordinators.sidebar')
+  @include('partials.coordinator.sidebar')
 @endsection
 
 @section('content')
@@ -30,7 +30,7 @@
                   class="nav-link active fw-semibold"
                   data-bs-toggle="tab"
                   data-bs-target="#profile-overview">
-                  {{ $lga->name }} CVR Statistical Analysis
+                  {{ $ward->name }} CVR Statistical Analysis
                 </button>
               </li>
             </ul>
@@ -44,10 +44,10 @@
                         <div class="card border-primary shadow-lg h-100">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
-                            <small class="text-primary fw-semibold">LGA</small>
-                            <h3 class="fw-bold mb-0">{{ $lga->name }}</h3>
+                            <small class="text-primary fw-semibold">Ward</small>
+                            <h3 class="fw-bold mb-0">{{ $ward->name }}</h3>
                             </div>
-                            <i class="bi bi-shop text-primary fs-1"></i>
+                            <i class="bi bi-collection text-primary fs-1"></i>
                         </div>
                         </div>
                     </div>
@@ -56,10 +56,10 @@
                         <div class="card border-success shadow-lg h-100">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
-                            <small class="text-success fw-semibold">Wards</small>
-                            <h3 class="fw-bold mb-0">{{ count($wards) }}</h3>
+                            <small class="text-success fw-semibold">PUs</small>
+                            <h3 class="fw-bold mb-0">{{ count($pus) }}</h3>
                             </div>
-                            <i class="bi bi-collection text-success fs-1"></i>
+                            <i class="bi bi-pin-map text-success fs-1"></i>
                         </div>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                             <small class="text-info fw-semibold">Total CVRs</small>
-                            <h3 class="fw-bold mb-0">{{ $lgaCvrCount }}</h3>
+                            <h3 class="fw-bold mb-0">{{ $wardCvrCount }}</h3>
                             </div>
                             <i class="bi bi-file-text text-info fs-1"></i>
                         </div>
@@ -77,53 +77,53 @@
                     </div>
                 </div>
 
-                <!-- Ward List -->
+                <!-- PU List -->
                 <div class="list-group list-group-flush">
 
-                  @forelse($wards as $ward)
+                  @forelse($pus as $pu)
                     <div class="list-group-item py-3 bg-light border rounded-3 shadow-sm mb-2">
                         <div class="row align-items-center">
 
                         <div class="col-md-9">
                             <h6 class="fw-bold text-uppercase mb-1 d-flex align-items-center">
                             <i class="bi bi-flag me-2 text-primary"></i>
-                            {{ $ward->name }}
+                            {{ $pu->name }}
                             </h6>
 
                             <div class="d-flex flex-wrap gap-3 small text-muted mt-1">
-                            <span class="d-flex align-items-center">
-                                <i class="bi bi-pin-map me-1 text-secondary"></i>
-                                <strong class="me-1">{{ count($ward->pus) }}</strong> PUs
-                            </span>
+                                <span class="d-flex align-items-center">
+                                    <strong class="me-1">{{ $pu->number }}</strong>
+                                </span>
 
-                            <span class="d-flex align-items-center">
-                                <i class="bi bi-file-text me-1 text-secondary"></i>
-                                <strong class="me-1">{{ $ward->cvr_count }}</strong> CVRs
-                            </span>
+                                <span class="d-flex align-items-center">
+                                    <i class="bi bi-file-text me-1 text-secondary"></i>
+                                    <strong class="me-1">{{ $pu->cvr_count }}</strong> CVRs
+                                </span>
                             </div>
                         </div>
 
-                        <div class="col-md-3 text-md-end mt-3 mt-md-0 d-flex justify-content-end gap-2">
-                          <!-- Update button triggers modal -->
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mb-3">
                           <button 
-                              class="btn btn-outline-success btn-sm px-2" 
+                              class="btn btn-outline-success btn-sm px-3" 
                               data-bs-toggle="modal" 
-                              data-bs-target="#update-cvr-modal" 
-                              data-ward-id="{{ $ward->id }}">
-                              Update
+                              data-bs-target="#update-pu-cvr-modal" 
+                              data-pu-id="{{ $pu->id }}">
+                              Add CVRs
                           </button>
 
-                          <a href="/coordinators/states/{{$lga->state->id}}/zones/{{$lga->zone->id}}/lgas/{{$lga->id}}/wards/{{$ward->id}}/cvr" 
-                            class="btn btn-outline-primary btn-sm px-2">
+                          <a href="/coordinator/states/{{$pu->state->id}}/zones/{{$pu->zone->id}}/lgas/{{$pu->lga->id}}/wards/{{$pu->ward->id}}/pus/{{$pu->id}}/cvr" 
+                            class="btn btn-outline-primary btn-sm px-3">
                               <i class="bi bi-eye me-1"></i>
                               View CVRs
                           </a>
                         </div>
-                      </div>
-                  </div>
+
+                        </div>
+                    </div>
                   @empty
                     <div class="alert alert-warning">
-                      No wards found for this LGA.
+                      No PUs found for this ward.
                     </div>
                   @endforelse
 
@@ -139,47 +139,44 @@
     </div>
   </section>
 
-</main>
+<</main>
 
-@include('coordinators.cvr.update-ward-cvr-modal')
+@include('coordinator.cvr.update-pu-cvr-modal') {{-- modal partial --}}
 
 @endsection
 
 @section('script')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const updateModal = document.getElementById('update-cvr-modal');
+    const updateModal = document.getElementById('update-pu-cvr-modal');
 
     updateModal.addEventListener('show.bs.modal', function(event) {
-        const button = event.relatedTarget; // Button that triggered the modal
-        const wardId = button.getAttribute('data-ward-id');
-        const input = updateModal.querySelector('#modal-ward-id');
-        input.value = wardId;
+        const button = event.relatedTarget;
+        const puId = button.getAttribute('data-pu-id');
+        const input = updateModal.querySelector('#modal-pu-id');
+        input.value = puId;
     });
 
-    // Optional: handle form submission via AJAX
-    const form = document.getElementById('update-cvr-form');
+    const form = document.getElementById('update-pu-cvr-form');
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        const wardId = form.querySelector('#modal-ward-id').value;
-        const count = form.querySelector('#cvr-count').value;
+        const puId = form.querySelector('#modal-pu-id').value;
+        const count = form.querySelector('#pu-cvr-count').value;
 
-        // Example: AJAX request
-        fetch('/coordinators/cvrs/update', {
+        fetch('/coordinator/cvrs/update-pu', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({ ward_id: wardId, count: count })
+            body: JSON.stringify({ pu_id: puId, count: count })
         })
         .then(res => res.json())
         .then(data => {
             if(data.success) {
-                location.reload(); // or update the count dynamically
+                location.reload();
             } else {
-                // Handle errors
-                alert('Error updating CVRs');
+                alert('Error adding CVRs');
             }
         });
     });

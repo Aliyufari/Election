@@ -16,6 +16,6 @@ class DashboardController extends Controller
 
     public function coordinator()
     {
-        return view('coordinators.dashboard', []);
+        return view('coordinator.dashboard', []);
     }
 }

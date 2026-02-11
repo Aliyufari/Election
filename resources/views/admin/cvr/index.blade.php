@@ -50,6 +50,7 @@
                     <th>Status</th>
                     <th>Date Created</th>
                     <th>Date Updated</th>
+                    <th>Created By</th>
                     <th class="text-center pe-3">Actions</th>
                   </tr>
                 </thead>
@@ -58,11 +59,12 @@
                     <tr class="border-bottom">
                       <td class="fw-semibold text-dark">{{ $cvr->unique_id }}</td>
                       <td><span class="badge bg-secondary rounded-pill">{{ $cvr->type }}</span></td>
-                      <td><span class="badge bg-success rounded-pill">{{ $cvr->pu->ward->name }}</span></td>
-                      <td><span class="badge bg-info rounded-pill">{{ $cvr->pu->name }}</span></td>
+                      <td><span class="badge bg-success rounded-pill">{{ $cvr->pu?->ward?->name ?? 'N/A' }}</span></td>
+                      <td><span class="badge bg-info rounded-pill">{{ $cvr->pu?->name ?? 'N/A' }}</span></td>
                       <td><span class="badge bg-warning rounded-pill">{{ $cvr->status }}</span></td>
-                      <td class="text-muted small">{{ $cvr->created_at->format('d M Y, h:i A') }}</td>
-                      <td class="text-muted small">{{ $cvr->updated_at->format('d M Y, h:i A') }}</td>
+                      <td class="text-muted small">{{ $cvr->created_at?->format('d M Y, h:i A') ?? 'N/A' }}</td>
+                      <td class="text-muted small">{{ $cvr->updated_at?->format('d M Y, h:i A') ?? 'N/A' }}</td>
+                      <td class="text-muted small">{{ $cvr->createdBy?->name ?? 'N/A' }}</td>
                       <td class="text-center pe-3">
                         <div class="btn-group" role="group">
                           <a href="/admin/cvrs/{{ $cvr->id }}" class="btn btn-sm btn-outline-primary" title="View">

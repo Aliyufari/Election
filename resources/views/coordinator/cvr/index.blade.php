@@ -5,7 +5,7 @@
 @endsection
 
 @section('sidebar')
-  @include('partials.coordinators.sidebar')
+  @include('partials.coordinator.sidebar')
 @endsection
 
 @section('content')
@@ -65,13 +65,13 @@
                       <td class="text-muted small">{{ $cvr->updated_at->format('d M Y, h:i A') }}</td>
                       <td class="text-center pe-3">
                         <div class="btn-group" role="group">
-                          <a href="/coordinators/cvrs/{{ $cvr->id }}" class="btn btn-sm btn-outline-primary" title="View">
+                          <a href="/coordinator/cvrs/{{ $cvr->id }}" class="btn btn-sm btn-outline-primary" title="View">
                             <i class="bi bi-eye"></i>
                           </a>
-                          <a href="/coordinators/cvrs/{{ $cvr->id }}/edit" class="btn btn-sm btn-outline-success" title="Edit">
+                          <a href="/coordinator/cvrs/{{ $cvr->id }}/edit" class="btn btn-sm btn-outline-success" title="Edit">
                             <i class="bi bi-pencil"></i>
                           </a>
-                          <form method="POST" action="/coordinators/cvrs/{{ $cvr->id }}" class="d-inline">
+                          <form method="POST" action="/coordinator/cvrs/{{ $cvr->id }}" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this CVR?')">
@@ -106,7 +106,7 @@
 
 </main><!-- End #main -->
 
-@include('coordinators.cvr.add-cvr-modal')
+@include('coordinator.cvr.add-cvr-modal')
 
 <style>
   .table > :not(caption) > * > * {
@@ -153,7 +153,7 @@ $(document).ready(function () {
 
     $.ajax({
       type: "POST",
-      url: "/coordinators/cvrs",
+      url: "/coordinator/cvrs",
       data: formData,
       processData: false,
       contentType: false,
@@ -207,7 +207,7 @@ $(document).ready(function () {
 
     if (!stateId) return;
 
-    $.get(`/coordinators/states/${stateId}`, function(data) {
+    $.get(`/coordinator/states/${stateId}`, function(data) {
       let options = '<option value="">Select zone</option>';
       data.state.zones.forEach(zone => {
         options += `<option value="${zone.id}">${zone.name}</option>`;
@@ -223,7 +223,7 @@ $(document).ready(function () {
     resetSelect('#pu', 'Select PU');
     if (!zoneId) return;
 
-    $.get(`/coordinators/zones/${zoneId}`, function(data) {
+    $.get(`/coordinator/zones/${zoneId}`, function(data) {
       let options = '<option value="">Select LGA</option>';
       data.zone.lgas.forEach(lga => {
         options += `<option value="${lga.id}">${lga.name}</option>`;
@@ -238,7 +238,7 @@ $(document).ready(function () {
     resetSelect('#pu', 'Select PU');
     if (!lgaId) return;
 
-    $.get(`/coordinators/lgas/${lgaId}`, function(data) {
+    $.get(`/coordinator/lgas/${lgaId}`, function(data) {
       let options = '<option value="">Select ward</option>';
       data.lga.wards.forEach(ward => {
         options += `<option value="${ward.id}">${ward.name}</option>`;
@@ -252,7 +252,7 @@ $(document).ready(function () {
     resetSelect('#pu', 'Select PU');
     if (!wardId) return;
 
-    $.get(`/coordinators/wards/${wardId}`, function(data) {
+    $.get(`/coordinator/wards/${wardId}`, function(data) {
       let options = '<option value="">Select PU</option>';
       data.ward.pus.forEach(pu => {
         options += `<option value="${pu.id}">${pu.name}</option>`;

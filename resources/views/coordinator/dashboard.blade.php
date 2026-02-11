@@ -5,7 +5,7 @@
 @endsection
 
 @section('sidebar')
-  @include('partials.coordinators.sidebar')
+  @include('partials.coordinator.sidebar')
 @endsection
 
 @section('content')

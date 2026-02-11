@@ -17,7 +17,7 @@ class CvrPolicy
      */
     public function before(User $user, string $ability): bool|null
     {
-        if ($this->hasAnyRoleUser($user, [
+        if ($user->hasAnyRole([
             Role::SUPER,
             Role::ADMIN,
         ])) {
@@ -32,7 +32,7 @@ class CvrPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasAnyRoleUser($user, $this->coordinatorRoles());
+        return $user->hasAnyRole($this->coordinatorRoles());
     }
 
     /**
@@ -43,16 +43,16 @@ class CvrPolicy
         $pu = $cvr->pu;
 
         return match (true) {
-            $this->isStateCoordinatorUser($user) =>
+            $user->isStateCoordinator() =>
             $pu->state_id === $user->state_id,
 
-            $this->isZonalCoordinatorUser($user) =>
+            $user->isZonalCoordinator() =>
             $pu->zone_id === $user->zone_id,
 
-            $this->isLgaCoordinatorUser($user) =>
+            $user->isLgaCoordinator() =>
             $pu->lga_id === $user->lga_id,
 
-            $this->isWardCoordinatorUser($user) =>
+            $user->isWardCoordinator() =>
             $pu->ward_id === $user->ward_id,
 
             default => false,
@@ -64,12 +64,11 @@ class CvrPolicy
      */
     public function create(User $user): bool
     {
-        return $this->hasAnyRoleUser($user, $this->coordinatorRoles());
+        return $user->hasAnyRole($this->coordinatorRoles());
     }
 
     /**
      * Update CVR
-     * (Super/Admin already allowed via before())
      */
     public function update(User $user, Cvr $cvr): bool
     {
@@ -81,11 +80,8 @@ class CvrPolicy
      */
     public function delete(User $user, Cvr $cvr): bool
     {
-        if ($this->isStateCoordinatorUser($user)) {
-            return $cvr->pu->state_id === $user->state_id;
-        }
-
-        return false;
+        return $user->isStateCoordinator()
+            && $cvr->pu->state_id === $user->state_id;
     }
 
     /**

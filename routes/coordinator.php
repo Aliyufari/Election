@@ -1,15 +1,15 @@
 <?php
 
-use App\Http\Controllers\Coordinators\CoordinatorCvrController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CvrController;
-use App\Http\Controllers\PusController;
-use App\Http\Controllers\LgasController;
 use App\Http\Controllers\UsersController;
-use App\Http\Controllers\WardsController;
-use App\Http\Controllers\ZonesController;
-use App\Http\Controllers\StatesController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Coordinator\CoordinatorCvrController;
+use App\Http\Controllers\Coordinator\CoordinatorLgaController;
+use App\Http\Controllers\Coordinator\CoordinatorPuController;
+use App\Http\Controllers\Coordinator\CoordinatorRoleController;
+use App\Http\Controllers\Coordinator\CoordinatorStateController;
+use App\Http\Controllers\Coordinator\CoordinatorWardController;
+use App\Http\Controllers\Coordinator\CoordinatorZoneController;
 
 Route::middleware(
     'auth',
@@ -23,21 +23,28 @@ Route::middleware(
     Route::put('/coordinator/profile/{user}', [UsersController::class, 'updatePassword']);
     Route::patch('/coordinator/profile/{user}', [UsersController::class, 'updateProfile']);
 
-    Route::get('/coordinator/state/list', [StatesController::class, 'list']);
-    Route::get('/coordinator/states/{state}/info', [StatesController::class, 'info']);
-    Route::get('/coordinator/states/{state}/zones', [StatesController::class, 'zones']);
+    /* Roles */
+    Route::get('/coordinator/roles', [CoordinatorRoleController::class, 'index']);
 
-    Route::get('/coordinator/zones/{zone}/lgas', [ZonesController::class, 'lgas']);
+    /* States */
+    Route::get('/coordinator/states', [CoordinatorStateController::class, 'index']);
+    Route::get('/coordinator/states/{state}', [CoordinatorStateController::class, 'show']);
 
-    Route::get('/coordinator/lgas/{lga}/info', [LgasController::class, 'info']);
+    /* Zones */
+    Route::get('/coordinator/zones', [CoordinatorZoneController::class, 'index']);
+    Route::get('/coordinator/zones/{zone}', [CoordinatorZoneController::class, 'show']);
 
-    Route::get('/coordinator/wards/{ward}/info', [WardsController::class, 'info']);
-    Route::put('/coordinator/wards/{ward}/registrations', [WardsController::class, 'registrations']);
-    Route::put('/coordinator/wards/{ward}/accreditations', [WardsController::class, 'accreditations']);
+    /* LGAs */
+    Route::get('/coordinator/lgas', [CoordinatorLgaController::class, 'index']);
+    Route::get('/coordinator/lgas/{lga}', [CoordinatorLgaController::class, 'show']);
 
-    Route::get('/coordinator/pus/info', [PusController::class, 'info']);
-    Route::put('/coordinator/pus/{pu}/registrations', [PusController::class, 'registrations']);
-    Route::put('/coordinator/pus/{pu}/accreditations', [PusController::class, 'accreditations']);
+    /* Wards */
+    Route::get('/coordinator/wards', [CoordinatorWardController::class, 'index']);
+    Route::get('/coordinator/wards/{ward}', [CoordinatorWardController::class, 'show']);
+
+    /* PUs */
+    Route::get('/coordinator/pus', [CoordinatorPuController::class, 'index']);
+    Route::get('/coordinator/pus/{pu}', [CoordinatorPuController::class, 'show']);
 
     /* CVR */
     Route::get('/coordinator/cvr/records', [CoordinatorCvrController::class, 'index']);
@@ -46,8 +53,10 @@ Route::middleware(
     Route::post('/coordinator/cvrs/update-pu', [CoordinatorCvrController::class, 'updatePuCvr']);
     Route::get('/coordinator/cvr/states', [CoordinatorCvrController::class, 'states']);
     Route::get('/coordinator/cvr/voters', [CoordinatorCvrController::class, 'voters']);
-    Route::get('/coordinator/cvr/logins', [CoordinatorCvrController::class, 'logins']);
-    Route::post('/coordinator/cvr/logins', [CoordinatorCvrController::class, 'storeLogin']);
+    Route::get('/coordinator/cvr/logins', [CoordinatorCvrController::class, 'logins'])
+        ->middleware('role:state_coordinator,zonal_coordinator,lga_coordinator');
+    Route::post('/coordinator/cvr/logins', [CoordinatorCvrController::class, 'storeLogin'])
+        ->middleware('role:state_coordinator,zonal_coordinator,lga_coordinator');
 
     Route::get('/coordinator/states/{state}/cvr', [CoordinatorCvrController::class, 'zones']);
     Route::get('/coordinator/states/{state}/zones/{zone}/cvr', [CoordinatorCvrController::class, 'lgas']);

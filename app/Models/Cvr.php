@@ -24,19 +24,14 @@ class Cvr extends Model
 
     public function createdBy()
     {
-        return $this->belongsTo(Pu::class);
+        return $this->belongsTo(User::class);
     }
 
     public static function generateUniqueId(): string
     {
         do {
-            $letters = '';
-            for ($i = 0; $i < 3; $i++) {
-                $letters .= chr(rand(65, 90));
-            }
-
             $numbers = str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT);
-            $id = $letters . $numbers;
+            $id = 'PRE' . $numbers;
         } while (self::where('unique_id', $id)->exists());
 
         return $id;

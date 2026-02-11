@@ -61,7 +61,7 @@ class LoginController extends Controller
                 ->with('success', 'Welcome back Admin!');
         }
 
-        // Coordinators
+        // coordinator
         if ($user->hasAnyRole([
             'state_coordinator',
             'lga_coordinator',

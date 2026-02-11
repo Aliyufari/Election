@@ -40,15 +40,6 @@
                             <div class="invalid-feedback" id="password-error"></div>
                         </div>
 
-                        <!-- Role -->
-                        <div class="col-md-6">
-                            <label for="role" class="form-label">Role</label>
-                            <select class="form-select" id="role" name="role_id" required>
-                                <option value="">Select role</option>
-                            </select>
-                            <div class="invalid-feedback" id="role-error"></div>
-                        </div>
-
                         <!-- Gender -->
                         <div class="col-md-6">
                             <label for="gender" class="form-label">Gender</label>
@@ -61,8 +52,17 @@
                             <div class="invalid-feedback" id="gender-error"></div>
                         </div>
 
-                        <!-- State -->
+                        <!-- Role -->
                         <div class="col-md-6">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" name="role_id" required>
+                                <option value="">Select role</option>
+                            </select>
+                            <div class="invalid-feedback" id="role-error"></div>
+                        </div>
+
+                        <!-- State -->
+                        <div class="col-md-6" id="state-wrapper">
                             <label for="state" class="form-label">State</label>
                             <select class="form-select" id="state" name="state_id" required>
                                 <option value="">Select state</option>
@@ -73,14 +73,33 @@
                             <div class="invalid-feedback" id="state-error"></div>
                         </div>
 
+                        <!-- Zone -->
+                        <div class="col-md-6 d-none" id="zone-wrapper">
+                            <label for="zone" class="form-label">Zone</label>
+                            <select class="form-select" id="zone" name="zone_id" required>
+                                <option value="">Select zone</option>
+                                {{-- Populated dynamically via state selection --}}
+                            </select>
+                            <div class="invalid-feedback"  id="zone-error"></div>
+                        </div>
+
                         <!-- LGA -->
-                        <div class="col-md-6">
+                        <div class="col-md-6 d-none" id="lga-wrapper">
                             <label for="lga" class="form-label">LGA</label>
                             <select class="form-select" id="lga" name="lga_id" required>
                                 <option value="">Select LGA</option>
                                 {{-- Populated dynamically via state selection --}}
                             </select>
                             <div class="invalid-feedback"  id="lga-error"></div>
+                        </div>
+
+                        <!-- Ward -->
+                        <div class="col-md-6 d-none" id="ward-wrapper">
+                            <label for="ward" class="form-label">Ward</label>
+                            <select class="form-select" id="ward" name="ward_id">
+                                <option value="">Select Ward</option>
+                            </select>
+                            <div class="invalid-feedback" id="ward-error"></div>
                         </div>
                     </div>
 

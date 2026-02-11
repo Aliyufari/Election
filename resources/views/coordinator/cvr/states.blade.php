@@ -5,7 +5,7 @@
 @endsection
 
 @section('sidebar')
-  @include('partials.coordinators.sidebar')
+  @include('partials.coordinator.sidebar')
 @endsection
 
 @section('content')
@@ -46,7 +46,7 @@
                         @foreach($states as $state)
                         <div class="col-lg-12 col-md-12 label mb-2">
                           <i class="bi bi-search"></i>
-                          <a href="/coordinators/states/{{$state->id}}/cvr">{{$state->name}}</a>
+                          <a href="/coordinator/states/{{$state->id}}/cvr">{{$state->name}}</a>
                         </div>
                         @endforeach
                     @endif
