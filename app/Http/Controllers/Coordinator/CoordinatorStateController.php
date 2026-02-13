@@ -32,7 +32,7 @@ class CoordinatorStateController extends Controller
     {
         $user = Auth::user();
 
-        if ($state->id !== $user->state_id) {
+        if ($state->id != $user->state_id) {
             return response()->json([
                 'state' => null,
             ]);
