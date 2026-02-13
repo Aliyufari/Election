@@ -250,7 +250,6 @@ $(document).ready(function () {
 
     $.get(`/coordinator/states/${stateId}`, function (data) {
       let options = '<option value="">Select zone</option>';
-      console.log(data.state);
       
       data.state.zones.forEach(zone => {
         options += `<option value="${zone.id}">${zone.name}</option>`;
