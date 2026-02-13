@@ -32,8 +32,6 @@ class CoordinatorZoneController extends Controller
     {
         $user = Auth::user();
 
-        dd([$zone->state_id, $user->state_id]);
-
         if ($zone->state_id !== $user->state_id) {
             return response()->json([
                 'zone' => null,
