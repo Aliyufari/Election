@@ -271,8 +271,6 @@ $(document).ready(function () {
     }
 
     $.get(`/coordinator/zones/${zoneId}`, function (data) {
-      console.log(data);
-      
       let options = '<option value="">Select LGA</option>';
       data.zone.lgas.forEach(lga => {
         options += `<option value="${lga.id}">${lga.name}</option>`;
