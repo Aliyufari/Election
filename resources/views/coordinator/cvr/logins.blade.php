@@ -66,7 +66,7 @@
                           <td>
                             <span class="badge bg-secondary rounded-pill">{{ $user->gender }}</span>
                           </td>
-                          <td>{{ "Bauchi" }}</td>
+                          <td>{{ $user->lga->name ?? '-' }}</td>
                           <td class="text-center pe-3">
                             <div class="btn-group" role="group">
                               <a href="/coordinator/users/{{ $user->id }}" class="btn btn-sm btn-outline-primary" title="View">
