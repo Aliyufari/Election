@@ -22,7 +22,7 @@ class CvrController extends Controller
     {
         $states = State::with('zones', 'lgas', 'wards', 'pus', 'users')->get();
         return view('admin.cvr.index', [
-            'cvrs' => Cvr::with('pu', 'createdBy')->paginate(10),
+            'cvrs' => Cvr::with('pu', 'createdBy')->latest()->paginate(20),
             'states' => $states
         ]);
     }
@@ -216,7 +216,7 @@ class CvrController extends Controller
                     ]);
                 })
                 ->latest()
-                ->paginate(10),
+                ->paginate(20),
 
             'states' => State::latest()->get(),
             'zones'  => Zone::latest()->get(),

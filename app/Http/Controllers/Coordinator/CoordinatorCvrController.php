@@ -35,7 +35,8 @@ class CoordinatorCvrController extends Controller
 
         $cvrs = $this
             ->scopedCvrs($user)
-            ->paginate(10);
+            ->latest()
+            ->paginate(20);
 
         $states = State::with('zones', 'lgas', 'wards', 'pus')->get();
 
@@ -212,7 +213,7 @@ class CoordinatorCvrController extends Controller
         }
 
         return view('coordinator.cvr.logins', [
-            'users'  => $users->paginate(10),
+            'users'  => $users->latest()->paginate(20),
             'states' => $states->latest()->get(),
             'zones'  => $zones->latest()->get(),
             'lgas'   => $lgas->latest()->get(),
