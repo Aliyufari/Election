@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pu;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\Cvr;
 use App\Models\Lga;
+use App\Models\Pu;
+use App\Models\State;
 use App\Models\User;
+use App\Models\Voter;
 use App\Models\Ward;
 use App\Models\Zone;
-use App\Models\State;
 use Illuminate\Http\Request;
-use App\Http\Requests\StoreUserRequest;
-use App\Models\Voter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class CvrController extends Controller
 {
     public function index()
     {
-        $states = State::with('zones', 'lgas', 'wards', 'pus', 'users')->paginate(10);
+        $states = State::with('zones', 'lgas', 'wards', 'pus', 'users')->get();
         return view('admin.cvr.index', [
             'cvrs' => Cvr::with('pu', 'createdBy')->paginate(10),
             'states' => $states
@@ -242,6 +244,53 @@ class CvrController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Login created successfully'
+        ]);
+    }
+
+    public function updateLogin(UpdateUserRequest $request, User $user)
+    {
+        $data = $request->validated();
+
+        if (!empty($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        if ($request->hasFile('image')) {
+            if ($user->image && Storage::disk('public')->exists($user->image)) {
+                Storage::disk('public')->delete($user->image);
+            }
+            $data['image'] = $request->file('image')
+                ->store('assets/img/users', 'public');
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Login updated successfully',
+        ]);
+    }
+
+    public function deleteLogin(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'You cannot delete your own account.',
+            ], 403);
+        }
+
+        if ($user->image && Storage::disk('public')->exists($user->image)) {
+            Storage::disk('public')->delete($user->image);
+        }
+
+        $user->delete();
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Login deleted successfully',
         ]);
     }
 

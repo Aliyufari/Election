@@ -49,13 +49,21 @@ Route::middleware(
     /* CVR */
     Route::get('/coordinator/cvr/records', [CoordinatorCvrController::class, 'index']);
     Route::post('/coordinator/cvrs', [CoordinatorCvrController::class, 'store']);
+    Route::put('/coordinator/cvrs/{cvr}', [CoordinatorCvrController::class, 'update']);
+    Route::delete('/coordinator/cvrs/{cvr}', [CoordinatorCvrController::class, 'destroy']);
     Route::post('/coordinator/cvrs/update', [CoordinatorCvrController::class, 'updateWardCvr']);
     Route::post('/coordinator/cvrs/update-pu', [CoordinatorCvrController::class, 'updatePuCvr']);
     Route::get('/coordinator/cvr/states', [CoordinatorCvrController::class, 'states']);
     Route::get('/coordinator/cvr/voters', [CoordinatorCvrController::class, 'voters']);
+
+    // Logins
     Route::get('/coordinator/cvr/logins', [CoordinatorCvrController::class, 'logins'])
         ->middleware('role:state_coordinator,zonal_coordinator,lga_coordinator');
     Route::post('/coordinator/cvr/logins', [CoordinatorCvrController::class, 'storeLogin'])
+        ->middleware('role:state_coordinator,zonal_coordinator,lga_coordinator');
+    Route::put('/coordinator/cvr/logins/{user}', [CoordinatorCvrController::class, 'updateLogin'])
+        ->middleware('role:state_coordinator,zonal_coordinator,lga_coordinator');
+    Route::delete('/coordinator/cvr/logins/{user}', [CoordinatorCvrController::class, 'deleteLogin'])
         ->middleware('role:state_coordinator,zonal_coordinator,lga_coordinator');
 
     Route::get('/coordinator/states/{state}/cvr', [CoordinatorCvrController::class, 'zones']);

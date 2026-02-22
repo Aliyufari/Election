@@ -134,6 +134,8 @@ Route::middleware('auth', 'role:admin,super')->group(function () {
     Route::post('/admin/cvr/update-figure', [CvrController::class, 'updateFigure']);
     Route::get('/admin/cvr/logins', [CvrController::class, 'logins']);
     Route::post('/admin/cvr/logins', [CvrController::class, 'storeLogin']);
+    Route::post('/admin/cvr/logins/{user}', [CvrController::class, 'updateLogin']);
+    Route::post('/admin/cvr/logins/{user}', [CvrController::class, 'deleteLogin']);
 
     Route::get('/admin/states/{state}/cvr', [CvrController::class, 'zones']);
     Route::get('/admin/states/{state}/zones/{zone}/cvr', [CvrController::class, 'lgas']);

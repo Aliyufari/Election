@@ -59,6 +59,8 @@
 
   <!-- Template Main JS File -->
   <script src="{{asset('assets/js/main.js')}}"></script>
+  
+  <script src="{{ asset('assets/js/sweetalert2.min.js') }}"></script>
 
   @yield('script')
   @yield('toast')
