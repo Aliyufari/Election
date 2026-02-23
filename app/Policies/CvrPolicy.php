@@ -13,22 +13,18 @@ class CvrPolicy
     use HandlesAuthorization, HandleRoles;
 
     /**
-     * Super & Admin can do everything
+     * Super & Admin can do everything.
      */
     public function before(User $user, string $ability): bool|null
     {
-        if ($user->hasAnyRole([
-            Role::SUPER,
-            Role::ADMIN,
-        ])) {
+        if ($user->hasAnyRole([Role::SUPER, Role::ADMIN])) {
             return true;
         }
-
         return null;
     }
 
     /**
-     * View CVR list
+     * View CVR list.
      */
     public function viewAny(User $user): bool
     {
@@ -36,31 +32,15 @@ class CvrPolicy
     }
 
     /**
-     * View a single CVR
+     * View a single CVR.
      */
     public function view(User $user, Cvr $cvr): bool
     {
-        $pu = $cvr->pu;
-
-        return match (true) {
-            $user->isStateCoordinator() =>
-            $pu->state_id === $user->state_id,
-
-            $user->isZonalCoordinator() =>
-            $pu->zone_id === $user->zone_id,
-
-            $user->isLgaCoordinator() =>
-            $pu->lga_id === $user->lga_id,
-
-            $user->isWardCoordinator() =>
-            $pu->ward_id === $user->ward_id,
-
-            default => false,
-        };
+        return $this->cvrInScope($user, $cvr);
     }
 
     /**
-     * Create CVR
+     * Create CVR.
      */
     public function create(User $user): bool
     {
@@ -68,24 +48,41 @@ class CvrPolicy
     }
 
     /**
-     * Update CVR
+     * Update CVR.
      */
     public function update(User $user, Cvr $cvr): bool
     {
-        return false;
+        return $this->cvrInScope($user, $cvr);
     }
 
     /**
-     * Delete CVR
+     * Delete CVR.
      */
     public function delete(User $user, Cvr $cvr): bool
     {
-        return $user->isStateCoordinator()
-            && $cvr->pu->state_id === $user->state_id;
+        return $this->cvrInScope($user, $cvr);
     }
 
     /**
-     * Coordinator roles helper
+     * Check if the CVR's PU falls within the user's jurisdiction.
+     */
+    private function cvrInScope(User $user, Cvr $cvr): bool
+    {
+        $pu = $cvr->pu;
+
+        if (!$pu) return false;
+
+        return match (true) {
+            $user->isStateCoordinator() => $pu->state_id === $user->state_id,
+            $user->isZonalCoordinator() => $pu->zone_id  === $user->zone_id,
+            $user->isLgaCoordinator()   => $pu->lga_id   === $user->lga_id,
+            $user->isWardCoordinator()  => $pu->ward_id  === $user->ward_id,
+            default                     => false,
+        };
+    }
+
+    /**
+     * Coordinator roles helper.
      */
     private function coordinatorRoles(): array
     {

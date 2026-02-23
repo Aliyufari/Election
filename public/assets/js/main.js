@@ -311,29 +311,29 @@
   /**
    * Count Down
    */
+    const countDown = () => {
+    const dayEl    = document.querySelector('.day');
+    const hourEl   = document.querySelector('.hour');
+    const minuteEl = document.querySelector('.minute');
+    const secondEl = document.querySelector('.second');
 
-  const countDown = () => {
+    // Only run if the countdown elements exist on this page
+    if (!dayEl || !hourEl || !minuteEl || !secondEl) return;
+
     const countDate = new Date("February 23, 2027 08:00:00").getTime();
-    const now = new Date().getTime();
-    const gap = countDate - now;
+    const now       = new Date().getTime();
+    const gap       = countDate - now;
 
-    //Gettin Started
     const second = 1000;
     const minute = second * 60;
-    const hour = minute * 60;
-    const day = hour * 24;
+    const hour   = minute * 60;
+    const day    = hour * 24;
 
-    // Calculation
-    const textDay = Math.floor(gap / day);
-    const textHour = Math.floor((gap % day) / hour);
-    const textMinute = Math.floor((gap % hour) / minute);
-    const textSecond = Math.floor((gap % minute) / second);
-
-    document.querySelector('.day').innerText = textDay;
-    document.querySelector('.hour').innerText = textHour;
-    document.querySelector('.minute').innerText = textMinute;
-    document.querySelector('.second').innerText = textSecond;
-  }
+    dayEl.innerText    = Math.floor(gap / day);
+    hourEl.innerText   = Math.floor((gap % day) / hour);
+    minuteEl.innerText = Math.floor((gap % hour) / minute);
+    secondEl.innerText = Math.floor((gap % minute) / second);
+  };
 
   setInterval(countDown, 1000);
 

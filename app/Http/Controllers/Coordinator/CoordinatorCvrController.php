@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\Coordinator;
 
-use App\Models\Pu;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\Cvr;
 use App\Models\Lga;
+use App\Models\Pu;
+use App\Models\Role;
+use App\Models\State;
 use App\Models\User;
 use App\Models\Ward;
 use App\Models\Zone;
-use App\Models\Role;
-use App\Models\State;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CoordinatorCvrController extends Controller
 {
@@ -87,55 +88,58 @@ class CoordinatorCvrController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Ensure the PU is within the coordinator's scope
         $this->authorizePuScope(auth()->user(), $request->pu_id);
 
         $cvr = Cvr::create([
-            'unique_id'  => $request->unique_id,
-            'type'       => $request->type,
-            'pu_id'      => $request->pu_id,
-            'status'     => $request->status,
-            'created_by' => auth()->id(),
+            'unique_id'     => $request->unique_id,
+            'type'          => $request->type,
+            'pu_id'         => $request->pu_id,
+            'status'        => $request->status,
+            'created_by_id' => auth()->id(),
+            'updated_by_id' => auth()->id(),
         ]);
 
         return response()->json([
             'status'  => true,
             'message' => 'CVR created successfully',
-            'data'    => $cvr->load('pu.ward'),
+            'data'    => $cvr->load('pu.ward', 'createdBy', 'updatedBy'),
         ]);
     }
-
-    /* ===================== UPDATE CVR ===================== */
 
     public function update(Request $request, Cvr $cvr)
     {
         $this->authorize('update', $cvr);
 
         $validator = Validator::make($request->all(), [
-            'unique_id' => ['required', 'string', 'max:100', "unique:cvrs,unique_id,{$cvr->id}"],
-            'type'      => ['required', 'string'],
-            'pu_id'     => ['required', 'exists:pus,id'],
-            'status'    => ['required', 'in:pending,approved,rejected'],
+            'unique_id' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('cvrs', 'unique_id')->ignore($cvr->id),
+            ],
+            'type'   => ['required', 'string'],
+            'pu_id'  => ['required', 'exists:pus,id'],
+            'status' => ['required', 'in:pending,approved,rejected'],
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Ensure the PU is within the coordinator's scope
         $this->authorizePuScope(auth()->user(), $request->pu_id);
 
         $cvr->update([
-            'unique_id' => $request->unique_id,
-            'type'      => $request->type,
-            'pu_id'     => $request->pu_id,
-            'status'    => $request->status,
+            'unique_id'     => $request->unique_id,
+            'type'          => $request->type,
+            'pu_id'         => $request->pu_id,
+            'status'        => $request->status,
+            'updated_by_id' => auth()->id(),
         ]);
 
         return response()->json([
             'status'  => true,
             'message' => 'CVR updated successfully',
-            'data'    => $cvr->load('pu.ward'),
+            'data'    => $cvr->load('pu.ward', 'createdBy', 'updatedBy'),
         ]);
     }
 

@@ -127,6 +127,8 @@ Route::middleware('auth', 'role:admin,super')->group(function () {
     /* CVR */
     Route::get('/admin/cvr/records', [CvrController::class, 'index']);
     Route::post('/admin/cvrs', [CvrController::class, 'store']);
+    Route::put('/admin/cvrs/{cvr}', [CvrController::class, 'update']);
+    Route::delete('/admin/cvrs/{cvr}', [CvrController::class, 'destroy']);
     Route::post('/admin/cvrs/update', [CvrController::class, 'updateWardCvr']);
     Route::post('/admin/cvrs/update-pu', [CvrController::class, 'updatePuCvr']);
     Route::get('/admin/cvr/states', [CvrController::class, 'states']);

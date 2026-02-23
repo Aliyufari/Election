@@ -15,15 +15,53 @@ use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CvrController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $states = State::with('zones', 'lgas', 'wards', 'pus', 'users')->get();
+        $query = Cvr::with([
+            'createdBy',
+            'updatedBy',
+            'pu.ward.lga.zone.state',
+        ])->latest();
+
+        // Filters
+        if ($request->filled('state_id')) {
+            $query->whereHas('pu', fn($q) => $q->where('state_id', $request->state_id));
+        }
+        if ($request->filled('zone_id')) {
+            $query->whereHas('pu', fn($q) => $q->where('zone_id', $request->zone_id));
+        }
+        if ($request->filled('lga_id')) {
+            $query->whereHas('pu', fn($q) => $q->where('lga_id', $request->lga_id));
+        }
+        if ($request->filled('ward_id')) {
+            $query->whereHas('pu', fn($q) => $q->where('ward_id', $request->ward_id));
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
         return view('admin.cvr.index', [
-            'cvrs' => Cvr::with('pu', 'createdBy')->latest()->paginate(20),
-            'states' => $states
+            'cvrs'   => $query->paginate(20)->withQueryString(),
+            'states' => State::latest()->get(),
+            'zones'  => Zone::when(
+                $request->filled('state_id'),
+                fn($q) => $q->where('state_id', $request->state_id)
+            )->latest()->get(),
+            'lgas'   => Lga::when(
+                $request->filled('zone_id'),
+                fn($q) => $q->where('zone_id', $request->zone_id)
+            )->latest()->get(),
+            'wards'  => Ward::when(
+                $request->filled('lga_id'),
+                fn($q) => $q->where('lga_id', $request->lga_id)
+            )->latest()->get(),
         ]);
     }
 
@@ -48,17 +86,64 @@ class CvrController extends Controller
         }
 
         $cvr = Cvr::create([
-            'unique_id' => $request->unique_id,
-            'type'      => $request->type,
-            'pu_id'     => $request->pu_id,
-            'status'    => $request->status,
-            'user_id'   => auth()->id(),
+            'unique_id'      => $request->unique_id,
+            'type'           => $request->type,
+            'pu_id'          => $request->pu_id,
+            'status'         => $request->status,
+            'created_by_id'  => auth()->id(),
+            'updated_by_id'  => auth()->id(),
         ]);
+
 
         return response()->json([
             'status'  => true,
             'message' => 'CVR created successfully',
-            'data'    => $cvr->load('pu.ward', 'createdBy'),
+            'data'    => $cvr->load('pu.ward', 'createdBy', 'updatedBy'),
+        ]);
+    }
+
+    public function update(Request $request, Cvr $cvr)
+    {
+        $validator = Validator::make($request->all(), [
+            'unique_id' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('cvrs', 'unique_id')->ignore($cvr->id),
+            ],
+            'type'   => ['required', 'string'],
+            'pu_id'  => ['required', 'exists:pus,id'],
+            'status' => ['required', 'in:pending,approved,rejected'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $cvr->update([
+            'unique_id'     => $request->unique_id,
+            'type'          => $request->type,
+            'pu_id'         => $request->pu_id,
+            'status'        => $request->status,
+            'updated_by_id' => auth()->id(),
+        ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'CVR updated successfully',
+            'data'    => $cvr->load('pu.ward', 'createdBy', 'updatedBy'),
+        ]);
+    }
+
+    public function destroy(Cvr $cvr)
+    {
+        $cvr->delete();
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'CVR deleted successfully',
         ]);
     }
 

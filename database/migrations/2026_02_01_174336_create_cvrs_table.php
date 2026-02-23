@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('type')->nullable();
             $table->string('status')->nullable();
             $table->foreignIdFor(Pu::class, 'pu_id')->nullable();
-            $table->foreignIdFor(User::class, 'user_id')->nullable();
+            $table->foreignIdFor(User::class, 'created_by_id')->nullable();
+            $table->foreignIdFor(User::class, 'updated_by_id')->nullable();
             $table->timestamps();
         });
     }

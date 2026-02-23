@@ -19,12 +19,11 @@
         <li class="breadcrumb-item active">CVRs</li>
       </ol>
     </nav>
-  </div><!-- End Page Title -->
+  </div>
 
   <section class="section dashboard">
     <div class="row">
 
-      <!-- CVR List -->
       <div class="col-12">
         <div class="card recent-sales overflow-auto border-0 shadow-sm">
 
@@ -38,6 +37,92 @@
             <p class="text-muted mt-2 mb-0">Manage all CVRs in the system</p>
           </div>
 
+          <!-- Filters -->
+          <div class="card-body pb-0">
+            <form method="GET" action="/admin/cvr/records" id="filter-form">
+              <div class="row g-2 align-items-end">
+
+                <div class="col-md-2">
+                  <label class="form-label small">State</label>
+                  <select class="form-select form-select-sm" name="state_id" id="filter-state">
+                    <option value="">All States</option>
+                    @foreach($states as $state)
+                      <option value="{{ $state->id }}" {{ request('state_id') == $state->id ? 'selected' : '' }}>
+                        {{ $state->name }}
+                      </option>
+                    @endforeach
+                  </select>
+                </div>
+
+                <div class="col-md-2">
+                  <label class="form-label small">Zone</label>
+                  <select class="form-select form-select-sm" name="zone_id" id="filter-zone">
+                    <option value="">All Zones</option>
+                    @foreach($zones as $zone)
+                      <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
+                        {{ $zone->name }}
+                      </option>
+                    @endforeach
+                  </select>
+                </div>
+
+                <div class="col-md-2">
+                  <label class="form-label small">LGA</label>
+                  <select class="form-select form-select-sm" name="lga_id" id="filter-lga">
+                    <option value="">All LGAs</option>
+                    @foreach($lgas as $lga)
+                      <option value="{{ $lga->id }}" {{ request('lga_id') == $lga->id ? 'selected' : '' }}>
+                        {{ $lga->name }}
+                      </option>
+                    @endforeach
+                  </select>
+                </div>
+
+                <div class="col-md-2">
+                  <label class="form-label small">Ward</label>
+                  <select class="form-select form-select-sm" name="ward_id" id="filter-ward">
+                    <option value="">All Wards</option>
+                    @foreach($wards as $ward)
+                      <option value="{{ $ward->id }}" {{ request('ward_id') == $ward->id ? 'selected' : '' }}>
+                        {{ $ward->name }}
+                      </option>
+                    @endforeach
+                  </select>
+                </div>
+
+                <div class="col-md-1">
+                  <label class="form-label small">Type</label>
+                  <select class="form-select form-select-sm" name="type">
+                    <option value="">All</option>
+                    <option value="registration" {{ request('type') === 'registration' ? 'selected' : '' }}>Registration</option>
+                    <option value="transfer"     {{ request('type') === 'transfer'     ? 'selected' : '' }}>Transfer</option>
+                    <option value="update"       {{ request('type') === 'update'       ? 'selected' : '' }}>Update</option>
+                  </select>
+                </div>
+
+                <div class="col-md-1">
+                  <label class="form-label small">Status</label>
+                  <select class="form-select form-select-sm" name="status">
+                    <option value="">All</option>
+                    <option value="pending"  {{ request('status') === 'pending'  ? 'selected' : '' }}>Pending</option>
+                    <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
+                    <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                  </select>
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                  <button type="submit" class="btn btn-sm btn-primary w-100">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                  </button>
+                  <a href="/admin/cvr/records" class="btn btn-sm btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle me-1"></i>Reset
+                  </a>
+                </div>
+
+              </div>
+            </form>
+          </div>
+
           <div class="card-body pt-3">
             <div class="table-responsive" id="cvr-table-container">
               <table class="table table-hover table-borderless">
@@ -45,12 +130,16 @@
                   <tr>
                     <th>ID</th>
                     <th>Type</th>
+                    <th>State</th>
+                    <th>Zone</th>
+                    <th>LGA</th>
                     <th>Ward</th>
                     <th>PU</th>
                     <th>Status</th>
+                    <th>Created By</th>
+                    <th>Updated By</th>
                     <th>Date Created</th>
                     <th>Date Updated</th>
-                    <th>Created By</th>
                     <th class="text-center pe-3">Actions</th>
                   </tr>
                 </thead>
@@ -59,12 +148,49 @@
                     <tr class="border-bottom">
                       <td class="fw-semibold text-dark">{{ $cvr->unique_id }}</td>
                       <td><span class="badge bg-secondary rounded-pill">{{ $cvr->type }}</span></td>
-                      <td><span class="badge bg-success rounded-pill">{{ $cvr->pu?->ward?->name ?? 'N/A' }}</span></td>
-                      <td><span class="badge bg-info rounded-pill">{{ $cvr->pu?->name ?? 'N/A' }}</span></td>
-                      <td><span class="badge bg-warning rounded-pill">{{ $cvr->status }}</span></td>
-                      <td class="text-muted small">{{ $cvr->created_at?->format('d M Y, h:i A') ?? 'N/A' }}</td>
-                      <td class="text-muted small">{{ $cvr->updated_at?->format('d M Y, h:i A') ?? 'N/A' }}</td>
+                      <td>
+                        @if($cvr->pu?->ward?->lga?->zone?->state)
+                          <span class="badge bg-dark rounded-pill">{{ $cvr->pu->ward->lga->zone->state->name }}</span>
+                        @else
+                          <span class="text-muted">-</span>
+                        @endif
+                      </td>
+                      <td>
+                        @if($cvr->pu?->ward?->lga?->zone)
+                          <span class="badge bg-warning rounded-pill">{{ $cvr->pu->ward->lga->zone->name }}</span>
+                        @else
+                          <span class="text-muted">-</span>
+                        @endif
+                      </td>
+                      <td>
+                        @if($cvr->pu?->ward?->lga)
+                          <span class="badge bg-info rounded-pill">{{ $cvr->pu->ward->lga->name }}</span>
+                        @else
+                          <span class="text-muted">-</span>
+                        @endif
+                      </td>
+                      <td>
+                        @if($cvr->pu?->ward)
+                          <span class="badge bg-success rounded-pill">{{ $cvr->pu->ward->name }}</span>
+                        @else
+                          <span class="text-muted">-</span>
+                        @endif
+                      </td>
+                      <td><span class="badge bg-primary rounded-pill">{{ $cvr->pu?->name ?? '-' }}</span></td>
+                      <td>
+                        @php
+                          $statusColor = match($cvr->status) {
+                            'approved' => 'success',
+                            'rejected' => 'danger',
+                            default    => 'warning',
+                          };
+                        @endphp
+                        <span class="badge bg-{{ $statusColor }} rounded-pill">{{ $cvr->status }}</span>
+                      </td>
                       <td class="text-muted small">{{ $cvr->createdBy?->name ?? 'N/A' }}</td>
+                      <td class="text-muted small">{{ $cvr->updatedBy?->name ?? 'N/A' }}</td>
+                      <td class="text-muted small">{{ $cvr->created_at?->format('d M Y, h:i A') ?? '' }}</td>
+                      <td class="text-muted small">{{ $cvr->updated_at?->format('d M Y, h:i A') ?? '' }}</td>
                       <td class="text-center pe-3">
                         <div class="btn-group" role="group">
                           <a href="/admin/cvrs/{{ $cvr->id }}" class="btn btn-sm btn-outline-primary" title="View">
@@ -96,25 +222,21 @@
               </table>
             </div>
 
-            <!-- Pagination -->
             <div class="d-flex justify-content-between align-items-center mt-4">
               <div class="text-muted small">
                 Showing {{ $cvrs->firstItem() ?? 0 }} to {{ $cvrs->lastItem() ?? 0 }} of {{ $cvrs->total() }} entries
               </div>
-              <div>
-                {{ $cvrs->links() }}
-              </div>
+              <div>{{ $cvrs->links() }}</div>
             </div>
 
           </div>
-
         </div>
-      </div><!-- End CVR List -->
+      </div>
 
     </div>
   </section>
 
-</main><!-- End #main -->
+</main>
 
 <!-- CVR Modal -->
 <div class="modal fade" id="cvr-modal" tabindex="-1" aria-labelledby="cvr-modal-title" aria-hidden="true">
@@ -132,14 +254,12 @@
 
           <div class="row g-3">
 
-            <!-- Unique ID -->
             <div class="col-md-6">
               <label class="form-label">CVR Unique ID</label>
               <input type="text" class="form-control" id="unique_id" name="unique_id">
               <div class="invalid-feedback" id="unique_id-error"></div>
             </div>
 
-            <!-- CVR Type -->
             <div class="col-md-6">
               <label class="form-label">CVR Type</label>
               <select class="form-select" name="type" id="type">
@@ -151,7 +271,6 @@
               <div class="invalid-feedback" id="type-error"></div>
             </div>
 
-            <!-- State -->
             <div class="col-md-4">
               <label class="form-label">State</label>
               <select class="form-select" id="state" name="state_id">
@@ -163,7 +282,6 @@
               <div class="invalid-feedback" id="state-error"></div>
             </div>
 
-            <!-- Zone -->
             <div class="col-md-4">
               <label class="form-label">Zone</label>
               <select class="form-select" id="zone" name="zone_id" disabled>
@@ -172,7 +290,6 @@
               <div class="invalid-feedback" id="zone-error"></div>
             </div>
 
-            <!-- LGA -->
             <div class="col-md-4">
               <label class="form-label">LGA</label>
               <select class="form-select" id="lga" name="lga_id" disabled>
@@ -181,7 +298,6 @@
               <div class="invalid-feedback" id="lga-error"></div>
             </div>
 
-            <!-- Ward -->
             <div class="col-md-4">
               <label class="form-label">Ward</label>
               <select class="form-select" id="ward" name="ward_id" disabled>
@@ -190,7 +306,6 @@
               <div class="invalid-feedback" id="ward-error"></div>
             </div>
 
-            <!-- PU -->
             <div class="col-md-4">
               <label class="form-label">Polling Unit</label>
               <select class="form-select" id="pu" name="pu_id" disabled>
@@ -199,7 +314,6 @@
               <div class="invalid-feedback" id="pu-error"></div>
             </div>
 
-            <!-- Status -->
             <div class="col-md-4">
               <label class="form-label">Status</label>
               <select class="form-select" name="status" id="status">
@@ -215,7 +329,7 @@
 
           <div class="mt-4 d-flex justify-content-end gap-2">
             <button type="submit" class="btn btn-primary" id="cvr-submit-btn">Save CVR</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-secondary" id="cvr-cancel-btn">Cancel</button>
           </div>
 
         </form>
@@ -226,15 +340,9 @@
 </div>
 
 <style>
-  .table > :not(caption) > * > * {
-    padding: 0.75rem 0.5rem;
-  }
-  .btn-group .btn {
-    margin: 0 2px;
-  }
-  .table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-  }
+  .table > :not(caption) > * > * { padding: 0.75rem 0.5rem; }
+  .btn-group .btn { margin: 0 2px; }
+  .table-hover tbody tr:hover { background-color: rgba(0,0,0,0.02); }
 </style>
 @endsection
 
@@ -249,6 +357,26 @@ $(document).ready(function () {
   const cvrModalEl = document.getElementById('cvr-modal');
   const cvrModal   = new bootstrap.Modal(cvrModalEl);
   let editingId    = null;
+
+  // ── CANCEL BUTTON — fix aria-hidden warning ──────────────
+  $('#cvr-cancel-btn').on('click', function () {
+    $(this).blur();
+    cvrModal.hide();
+  });
+
+  // ── RESET ON CLOSE ───────────────────────────────────────
+  cvrModalEl.addEventListener('hidden.bs.modal', function () {
+    editingId = null;
+    $('#cvr-form')[0].reset();
+    resetSelect('#zone', 'Select zone');
+    resetSelect('#lga',  'Select LGA');
+    resetSelect('#ward', 'Select ward');
+    resetSelect('#pu',   'Select PU');
+    clearErrors();
+    const focused = document.activeElement;
+    if (focused && cvrModalEl.contains(focused)) focused.blur();
+    $('#create-cvr-btn').trigger('focus');
+  });
 
   // ── OPEN FOR CREATE ──────────────────────────────────────
   $('#create-cvr-btn').on('click', function () {
@@ -266,8 +394,13 @@ $(document).ready(function () {
 
   // ── OPEN FOR EDIT ────────────────────────────────────────
   $(document).on('click', '.edit-cvr-btn', function () {
-    const btn = $(this);
-    editingId = btn.data('id');
+    const btn     = $(this);
+    editingId     = btn.data('id');
+    const stateId = btn.data('state_id');
+    const zoneId  = btn.data('zone_id');
+    const lgaId   = btn.data('lga_id');
+    const wardId  = btn.data('ward_id');
+    const puId    = btn.data('pu_id');
 
     $('#cvr-modal-title').text('Edit CVR');
     $('#cvr-submit-btn').text('Update CVR');
@@ -276,12 +409,6 @@ $(document).ready(function () {
     $('#unique_id').val(btn.data('unique_id'));
     $('#type').val(btn.data('type'));
     $('#status').val(btn.data('status'));
-
-    const stateId = btn.data('state_id');
-    const zoneId  = btn.data('zone_id');
-    const lgaId   = btn.data('lga_id');
-    const wardId  = btn.data('ward_id');
-    const puId    = btn.data('pu_id');
 
     resetSelect('#zone', 'Select zone');
     resetSelect('#lga',  'Select LGA');
@@ -403,7 +530,47 @@ $(document).ready(function () {
     }
   }
 
-  // ── CASCADING SELECTS ────────────────────────────────────
+  // ── FILTER — cascading zone/lga/ward on filter bar ───────
+  $('#filter-state').on('change', function () {
+    const stateId = $(this).val();
+    $('#filter-zone').html('<option value="">All Zones</option>');
+    $('#filter-lga').html('<option value="">All LGAs</option>');
+    $('#filter-ward').html('<option value="">All Wards</option>');
+    if (!stateId) return;
+
+    $.get(`/admin/states/${stateId}`, function (data) {
+      data.state.zones.forEach(z => {
+        $('#filter-zone').append(`<option value="${z.id}">${z.name}</option>`);
+      });
+    });
+  });
+
+  $('#filter-zone').on('change', function () {
+    const zoneId = $(this).val();
+    $('#filter-lga').html('<option value="">All LGAs</option>');
+    $('#filter-ward').html('<option value="">All Wards</option>');
+    if (!zoneId) return;
+
+    $.get(`/admin/zones/${zoneId}`, function (data) {
+      data.zone.lgas.forEach(l => {
+        $('#filter-lga').append(`<option value="${l.id}">${l.name}</option>`);
+      });
+    });
+  });
+
+  $('#filter-lga').on('change', function () {
+    const lgaId = $(this).val();
+    $('#filter-ward').html('<option value="">All Wards</option>');
+    if (!lgaId) return;
+
+    $.get(`/admin/lgas/${lgaId}`, function (data) {
+      data.lga.wards.forEach(w => {
+        $('#filter-ward').append(`<option value="${w.id}">${w.name}</option>`);
+      });
+    });
+  });
+
+  // ── MODAL CASCADING SELECTS ──────────────────────────────
   $('#state').on('change', function () {
     resetSelect('#zone', 'Select zone');
     resetSelect('#lga',  'Select LGA');

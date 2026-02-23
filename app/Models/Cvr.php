@@ -13,7 +13,8 @@ class Cvr extends Model
         'unique_id',
         'type',
         'pu_id',
-        'user_id',
+        'created_by_id',
+        'updated_by_id',
         'status',
     ];
 
@@ -24,7 +25,12 @@ class Cvr extends Model
 
     public function createdBy()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
     }
 
     public static function generateUniqueId(): string
