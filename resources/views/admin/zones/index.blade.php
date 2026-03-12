@@ -59,7 +59,7 @@
                           <td class="ps-3 fw-medium">{{ $sn++ }}</td>
                           <td class="fw-semibold text-dark">{{ $zone->name }}</td>
                           <td>
-                            <span class="badge bg-secondary rounded-pill">{{ $zone->state->name }}</span>
+                            <span class="badge bg-secondary rounded-pill">{{ $zone->state?->name ?? 'N/A' }}</span>
                           </td>
                           <td>
                             <span class="badge bg-success rounded-pill">{{ count($zone->lgas) }}</span>
