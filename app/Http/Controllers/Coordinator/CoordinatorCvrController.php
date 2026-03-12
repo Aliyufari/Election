@@ -27,15 +27,13 @@ class CoordinatorCvrController extends Controller
     }
 
     /* ===================== CVR LIST ===================== */
-
     public function index()
     {
         $this->authorize('viewAny', Cvr::class);
 
         $user = auth()->user();
 
-        $cvrs = $this
-            ->scopedCvrs($user)
+        $cvrs = Cvr::visibleTo($user)
             ->latest()
             ->paginate(20);
 
@@ -44,31 +42,6 @@ class CoordinatorCvrController extends Controller
         $coordinator = $user;
 
         return view('coordinator.cvr.index', compact('cvrs', 'states', 'coordinator'));
-    }
-
-    private function scopedCvrs(User $user)
-    {
-        return Cvr::with('pu.ward.lga.zone.state')
-            ->when(
-                $user->isStateCoordinator(),
-                fn($q) =>
-                $q->whereHas('pu', fn($q) => $q->where('state_id', $user->state_id))
-            )
-            ->when(
-                $user->isZonalCoordinator(),
-                fn($q) =>
-                $q->whereHas('pu', fn($q) => $q->where('zone_id', $user->zone_id))
-            )
-            ->when(
-                $user->isLgaCoordinator(),
-                fn($q) =>
-                $q->whereHas('pu', fn($q) => $q->where('lga_id', $user->lga_id))
-            )
-            ->when(
-                $user->isWardCoordinator(),
-                fn($q) =>
-                $q->whereHas('pu', fn($q) => $q->where('ward_id', $user->ward_id))
-            );
     }
 
     /* ===================== CREATE CVR ===================== */
@@ -158,10 +131,9 @@ class CoordinatorCvrController extends Controller
     }
 
     /* ===================== CVR LOGINS LIST ===================== */
-
     public function logins()
     {
-        $user = Auth::user();
+        $user = auth()->user();
 
         abort_unless(
             $user->hasAnyRole([
@@ -173,51 +145,41 @@ class CoordinatorCvrController extends Controller
             403
         );
 
-        $users  = User::with(['role', 'state', 'zone', 'lga', 'ward']);
+        // Users visible to this coordinator
+        $users = User::with(['role', 'state', 'zone', 'lga', 'ward', 'pu'])
+            ->visibleTo($user)
+            ->latest()
+            ->paginate(20);
+
+        // Filter dropdowns dynamically based on user's highest level
         $states = State::query();
         $zones  = Zone::query();
         $lgas   = Lga::query();
         $wards  = Ward::query();
         $pus    = Pu::query();
 
-        if ($user->isStateCoordinator()) {
-            $users->where('state_id', $user->state_id)
-                ->whereHas('role', fn($q) => $q->whereIn('name', [
-                    'zonal_coordinator',
-                    'lga_coordinator',
-                    'ward_coordinator',
-                ]));
-
+        if ($user->state_id) {
             $states->where('id', $user->state_id);
             $zones->where('state_id', $user->state_id);
             $lgas->where('state_id', $user->state_id);
             $wards->where('state_id', $user->state_id);
             $pus->where('state_id', $user->state_id);
-        } elseif ($user->isZonalCoordinator()) {
-            $users->where('zone_id', $user->zone_id)
-                ->whereHas('role', fn($q) => $q->whereIn('name', [
-                    'lga_coordinator',
-                    'ward_coordinator',
-                ]));
-
+        } elseif ($user->zone_id) {
             $zones->where('id', $user->zone_id);
             $lgas->where('zone_id', $user->zone_id);
             $wards->where('zone_id', $user->zone_id);
             $pus->where('zone_id', $user->zone_id);
-        } elseif ($user->isLgaCoordinator()) {
-            $users->where('lga_id', $user->lga_id)
-                ->whereHas('role', fn($q) => $q->where('name', 'ward_coordinator'));
-
+        } elseif ($user->lga_id) {
             $lgas->where('id', $user->lga_id);
             $wards->where('lga_id', $user->lga_id);
             $pus->where('lga_id', $user->lga_id);
-        } elseif ($user->isWardCoordinator()) {
-            // Ward coordinators cannot create any logins
-            abort(403, 'You are not authorized to manage logins.');
+        } elseif ($user->ward_id) {
+            $wards->where('id', $user->ward_id);
+            $pus->where('ward_id', $user->ward_id);
         }
 
         return view('coordinator.cvr.logins', [
-            'users'  => $users->latest()->paginate(20),
+            'users'  => $users,
             'states' => $states->latest()->get(),
             'zones'  => $zones->latest()->get(),
             'lgas'   => $lgas->latest()->get(),
@@ -228,7 +190,6 @@ class CoordinatorCvrController extends Controller
     }
 
     /* ===================== STORE LOGIN ===================== */
-
     public function storeLogin(StoreUserRequest $request)
     {
         $authUser = auth()->user();

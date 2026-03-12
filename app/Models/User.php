@@ -98,4 +98,54 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Pu::class);
     }
+
+    public function scopeVisibleTo($query, User $authUser)
+    {
+        if (!$authUser->hasAnyRole([
+            'state_coordinator',
+            'zonal_coordinator',
+            'lga_coordinator',
+            'ward_coordinator',
+        ])) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if ($authUser->state_id) {
+            $query->where(function ($q) use ($authUser) {
+                $q->where('state_id', $authUser->state_id)
+                    ->orWhere('zone_id', $authUser->zone_id)
+                    ->orWhere('lga_id', $authUser->lga_id)
+                    ->orWhere('ward_id', $authUser->ward_id);
+            });
+        } elseif ($authUser->zone_id) {
+            $query->where(function ($q) use ($authUser) {
+                $q->where('zone_id', $authUser->zone_id)
+                    ->orWhere('lga_id', $authUser->lga_id)
+                    ->orWhere('ward_id', $authUser->ward_id);
+            });
+        } elseif ($authUser->lga_id) {
+            $query->where(function ($q) use ($authUser) {
+                $q->where('lga_id', $authUser->lga_id)
+                    ->orWhere('ward_id', $authUser->ward_id);
+            });
+        } elseif ($authUser->ward_id) {
+            $query->where('ward_id', $authUser->ward_id);
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+
+        $query->whereHas('role', function ($q) use ($authUser) {
+            if ($authUser->isStateCoordinator()) {
+                $q->whereIn('name', ['zonal_coordinator', 'lga_coordinator', 'ward_coordinator']);
+            } elseif ($authUser->isZonalCoordinator()) {
+                $q->whereIn('name', ['lga_coordinator', 'ward_coordinator']);
+            } elseif ($authUser->isLgaCoordinator()) {
+                $q->where('name', 'ward_coordinator');
+            } elseif ($authUser->isWardCoordinator()) {
+                $q->where('name', 'ward_coordinator');
+            }
+        });
+
+        return $query;
+    }
 }

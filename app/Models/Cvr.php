@@ -42,4 +42,27 @@ class Cvr extends Model
 
         return $id;
     }
+
+    // app/Models/Cvr.php
+
+    public function scopeVisibleTo($query, User $authUser)
+    {
+        return $query->with('pu.ward.lga.zone.state')
+            ->when(
+                $authUser->isStateCoordinator() && $authUser->state_id,
+                fn($q) => $q->whereHas('pu', fn($q) => $q->where('state_id', $authUser->state_id))
+            )
+            ->when(
+                $authUser->isZonalCoordinator() && $authUser->zone_id,
+                fn($q) => $q->whereHas('pu', fn($q) => $q->where('zone_id', $authUser->zone_id))
+            )
+            ->when(
+                $authUser->isLgaCoordinator() && $authUser->lga_id,
+                fn($q) => $q->whereHas('pu', fn($q) => $q->where('lga_id', $authUser->lga_id))
+            )
+            ->when(
+                $authUser->isWardCoordinator() && $authUser->ward_id,
+                fn($q) => $q->whereHas('pu', fn($q) => $q->where('ward_id', $authUser->ward_id))
+            );
+    }
 }
