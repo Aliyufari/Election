@@ -9,144 +9,150 @@
 @endsection
 
 @section('content')
-  @php $authUser = auth()->user(); @endphp
-  <main id="main" class="main">
+<main id="main" class="main">
 
-    <div class="pagetitle">
-      <h1>CVR Panel</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item">CVR Panel</li>
-          <li class="breadcrumb-item active">CVR Logins</li>
-        </ol>
-      </nav>
-    </div>
+  <div class="pagetitle">
+    <h1>CVR Panel</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item">CVR Panel</li>
+        <li class="breadcrumb-item active">CVR Logins</li>
+      </ol>
+    </nav>
+  </div>
 
-    <section class="section dashboard">
-      <div class="row">
+  <section class="section dashboard">
+    <div class="row">
 
-        <div class="col-12">
-          <div class="card recent-sales overflow-auto border-0 shadow-sm">
+      <div class="col-12">
+        <div class="card recent-sales overflow-auto border-0 shadow-sm">
 
-            <div class="card-header bg-transparent border-0 pt-3 pb-0">
-              <div class="d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0 text-dark fw-bold">CVR Logins</h5>
-                <button id="create-cvr-login" class="btn btn-primary">
-                  <i class="bi bi-person-plus me-1"></i>Create CVR Login
-                </button>
-              </div>
-              <p class="text-muted mt-2 mb-0">Manage CVR Logins</p>
+          <div class="card-header bg-transparent border-0 pt-3 pb-0">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0 text-dark fw-bold">CVR Logins</h5>
+              <button id="create-cvr-login" class="btn btn-primary">
+                <i class="bi bi-person-plus me-1"></i>Create CVR Login
+              </button>
             </div>
+            <p class="text-muted mt-2 mb-0">Manage CVR Logins</p>
+          </div>
 
-            <div class="card-body pt-3">
-              <div class="table-responsive" id="cvr-table-container">
-                <table class="table table-hover table-borderless">
-                  <thead class="table-light">
-                    <tr>
-                      <th class="ps-3">#</th>
-                      <th>Name</th>
-                      <th>Username</th>
-                      <th>Role</th>
-                      <th>Email</th>
-                      <th>Gender</th>
-                      <th>Zone</th>
-                      <th>LGA</th>
-                      <th>Ward</th>
-                      <th class="text-center pe-3">Actions</th>
+          <div class="card-body pt-3">
+            <div class="table-responsive" id="cvr-table-container">
+              <table class="table table-hover table-borderless">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-3">#</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th>Gender</th>
+                    <th>State</th>
+                    <th>Zone</th>
+                    <th>LGA</th>
+                    <th>Ward</th>
+                    <th class="text-center pe-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($users as $user)
+                    <tr class="border-bottom">
+                      <td class="ps-3 fw-medium">{{ $sn++ }}</td>
+                      <td class="fw-semibold text-dark">{{ $user->name }}</td>
+                      <td>{{ $user->username }}</td>
+                      <td>
+                        <span class="badge bg-primary rounded-pill">
+                          {{ ucwords(str_replace('_', ' ', $user->role->name)) }}
+                        </span>
+                      </td>
+                      <td>{{ $user->email }}</td>
+                      <td><span class="badge bg-secondary rounded-pill">{{ $user->gender }}</span></td>
+                      <td>
+                        @if($user->state)
+                          <span class="badge bg-dark rounded-pill">{{ $user->state->name }}</span>
+                        @else
+                          <span class="text-muted">-</span>
+                        @endif
+                      </td>
+                      <td>
+                        @if($user->zone)
+                          <span class="badge bg-warning rounded-pill">{{ $user->zone->name }}</span>
+                        @else
+                          <span class="text-muted">-</span>
+                        @endif
+                      </td>
+                      <td>
+                        @if($user->lga)
+                          <span class="badge bg-info rounded-pill">{{ $user->lga->name }}</span>
+                        @else
+                          <span class="text-muted">-</span>
+                        @endif
+                      </td>
+                      <td>
+                        @if($user->ward)
+                          <span class="badge bg-success rounded-pill">{{ $user->ward->name }}</span>
+                        @else
+                          <span class="text-muted">-</span>
+                        @endif
+                      </td>
+                      <td class="text-center pe-3">
+                        <div class="btn-group" role="group">
+                          <a href="/coordinator/users/{{ $user->id }}" class="btn btn-sm btn-outline-primary" title="View">
+                            <i class="bi bi-eye"></i>
+                          </a>
+                          <a href="#" class="btn btn-sm btn-outline-success edit-user-btn"
+                            title="Edit"
+                            data-id="{{ $user->id }}"
+                            data-name="{{ $user->name }}"
+                            data-username="{{ $user->username }}"
+                            data-email="{{ $user->email }}"
+                            data-gender="{{ $user->gender }}"
+                            data-role_id="{{ $user->role_id }}"
+                            data-role_name="{{ $user->role->name }}"
+                            data-state_id="{{ $user->state_id ?? '' }}"
+                            data-zone_id="{{ $user->zone_id ?? '' }}"
+                            data-lga_id="{{ $user->lga_id ?? '' }}"
+                            data-ward_id="{{ $user->ward_id ?? '' }}">
+                            <i class="bi bi-pencil"></i>
+                          </a>
+                          <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn"
+                            title="Delete"
+                            data-id="{{ $user->id }}">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    @foreach($users as $user)
-                      <tr class="border-bottom">
-                        <td class="ps-3 fw-medium">{{ $sn++ }}</td>
-                        <td class="fw-semibold text-dark">{{ $user->name }}</td>
-                        <td>{{ $user->username }}</td>
-                        <td>
-                          <span class="badge bg-primary rounded-pill">
-                            {{ ucwords(str_replace('_', ' ', $user->role->name)) }}
-                          </span>
-                        </td>
-                        <td>{{ $user->email }}</td>
-                        <td>
-                          <span class="badge bg-secondary rounded-pill">{{ $user->gender }}</span>
-                        </td>
-                        <td>
-                          @if($user->zone)
-                            <span class="badge bg-warning rounded-pill">{{ $user->zone->name }}</span>
-                          @else
-                            <span class="text-muted">-</span>
-                          @endif
-                        </td>
-                        <td>
-                          @if($user->lga)
-                            <span class="badge bg-info rounded-pill">{{ $user->lga->name }}</span>
-                          @else
-                            <span class="text-muted">-</span>
-                          @endif
-                        </td>
-                        <td>
-                          @if($user->ward)
-                            <span class="badge bg-success rounded-pill">{{ $user->ward->name }}</span>
-                          @else
-                            <span class="text-muted">-</span>
-                          @endif
-                        </td>
-                        <td class="text-center pe-3">
-                          <div class="btn-group" role="group">
-                            <a href="/coordinator/users/{{ $user->id }}" class="btn btn-sm btn-outline-primary" title="View">
-                              <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="#" class="btn btn-sm btn-outline-success edit-user-btn"
-                              title="Edit"
-                              data-id="{{ $user->id }}"
-                              data-name="{{ $user->name }}"
-                              data-username="{{ $user->username }}"
-                              data-email="{{ $user->email }}"
-                              data-gender="{{ $user->gender }}"
-                              data-role_id="{{ $user->role_id }}"
-                              data-role_name="{{ $user->role->name }}"
-                              data-zone_id="{{ $user->zone_id ?? '' }}"
-                              data-lga_id="{{ $user->lga_id ?? '' }}"
-                              data-ward_id="{{ $user->ward_id ?? '' }}">
-                              <i class="bi bi-pencil"></i>
-                            </a>
-                            <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn"
-                              title="Delete"
-                              data-id="{{ $user->id }}">
-                              <i class="bi bi-trash"></i>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center mt-4">
-                <div class="text-muted small">
-                  Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }} entries
-                </div>
-                <div>{{ $users->links() }}</div>
-              </div>
-
+                  @endforeach
+                </tbody>
+              </table>
             </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <div class="text-muted small">
+                Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }} entries
+              </div>
+              <div>{{ $users->links() }}</div>
+            </div>
+
           </div>
         </div>
-
       </div>
-    </section>
 
-  </main>
+    </div>
+  </section>
 
-  @include('coordinator.cvr.modal')
+</main>
 
-  <style>
-    .table > :not(caption) > * > * { padding: 0.75rem 0.5rem; }
-    .btn-group .btn { margin: 0 2px; }
-    .table-hover tbody tr:hover { background-color: rgba(0,0,0,0.02); }
-  </style>
+@include('coordinator.cvr.modal')
+
+<style>
+  .table > :not(caption) > * > * { padding: 0.75rem 0.5rem; }
+  .btn-group .btn { margin: 0 2px; }
+  .table-hover tbody tr:hover { background-color: rgba(0,0,0,0.02); }
+</style>
 @endsection
 
 @section('footer')
@@ -161,12 +167,30 @@ $(document).ready(function () {
     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
   });
 
-  const authRole   = '{{ $authUser->role->name }}';
+  // ── EMBEDDED DATA — no AJAX needed ───────────────────────
+  const zonesData = @json($states->mapWithKeys(fn($s) => [
+    $s->id => $s->zones->map(fn($z) => ['id' => $z->id, 'name' => $z->name])
+  ]));
+  const lgasData = @json($states->flatMap(fn($s) => $s->zones)->mapWithKeys(fn($z) => [
+    $z->id => $z->lgas->map(fn($l) => ['id' => $l->id, 'name' => $l->name])
+  ]));
+  const wardsData = @json($states->flatMap(fn($s) => $s->zones)->flatMap(fn($z) => $z->lgas)->mapWithKeys(fn($l) => [
+    $l->id => $l->wards->map(fn($w) => ['id' => $w->id, 'name' => $w->name])
+  ]));
+
+  // Coordinator's own scope
+  const coord = {
+    state_id: {{ $coordinator->state_id ?? 'null' }},
+    zone_id:  {{ $coordinator->zone_id  ?? 'null' }},
+    lga_id:   {{ $coordinator->lga_id   ?? 'null' }},
+    ward_id:  {{ $coordinator->ward_id  ?? 'null' }},
+  };
+
   const cvrModalEl = document.getElementById('cvr-modal');
   const cvrModal   = new bootstrap.Modal(cvrModalEl);
   let editingId    = null;
 
-  // ── CANCEL BUTTON — blur before hiding to fix aria-hidden warning ──
+  // ── CANCEL BUTTON ────────────────────────────────────────
   $('#modal-cancel-btn').on('click', function () {
     $(this).blur();
     cvrModal.hide();
@@ -179,21 +203,12 @@ $(document).ready(function () {
     $('#password-hint').text('');
     hideAllLocationFields();
     clearErrors();
-
-    // Move focus back to the trigger button (fixes aria-hidden warning)
+    $('#zone').html('<option value="">Select zone</option>');
+    $('#lga').html('<option value="">Select LGA</option>');
+    $('#ward').html('<option value="">Select Ward</option>');
     const focused = document.activeElement;
-    if (focused && cvrModalEl.contains(focused)) {
-      focused.blur();
-    }
+    if (focused && cvrModalEl.contains(focused)) focused.blur();
     $('#create-cvr-login').trigger('focus');
-
-    // Clear AJAX-populated selects
-    if (authRole === 'state_coordinator') {
-      $('#lga').html('<option value="">Select LGA</option>');
-      $('#ward').html('<option value="">Select Ward</option>');
-    } else if (authRole === 'zonal_coordinator') {
-      $('#ward').html('<option value="">Select Ward</option>');
-    }
   });
 
   // ── OPEN FOR CREATE ──────────────────────────────────────
@@ -204,6 +219,19 @@ $(document).ready(function () {
     $('#password-hint').text('');
     hideAllLocationFields();
     clearErrors();
+
+    // Pre-fill coordinator's scope
+    if (coord.state_id) {
+      $('#state').val(coord.state_id);
+      populateSelect('#zone', zonesData[coord.state_id] || [], 'Select zone', coord.zone_id);
+    }
+    if (coord.zone_id) {
+      populateSelect('#lga', lgasData[coord.zone_id] || [], 'Select LGA', coord.lga_id);
+    }
+    if (coord.lga_id) {
+      populateSelect('#ward', wardsData[coord.lga_id] || [], 'Select Ward', coord.ward_id);
+    }
+
     cvrModal.show();
   });
 
@@ -212,6 +240,7 @@ $(document).ready(function () {
     const btn      = $(this);
     editingId      = btn.data('id');
     const roleName = btn.data('role_name');
+    const stateId  = btn.data('state_id');
     const zoneId   = btn.data('zone_id');
     const lgaId    = btn.data('lga_id');
     const wardId   = btn.data('ward_id');
@@ -230,47 +259,15 @@ $(document).ready(function () {
 
     toggleLocationFields(roleName);
 
-    if (authRole === 'state_coordinator') {
-      if (zoneId) {
-        $('#zone').val(zoneId);
-        $.get(`/coordinator/zones/${zoneId}`, function (data) {
-          let options = '<option value="">Select LGA</option>';
-          data.zone.lgas.forEach(l => {
-            const sel = l.id == lgaId ? 'selected' : '';
-            options += `<option value="${l.id}" ${sel}>${l.name}</option>`;
-          });
-          $('#lga').html(options);
-
-          if (lgaId) {
-            $.get(`/coordinator/lgas/${lgaId}`, function (data) {
-              let wOptions = '<option value="">Select Ward</option>';
-              data.lga.wards.forEach(w => {
-                const sel = w.id == wardId ? 'selected' : '';
-                wOptions += `<option value="${w.id}" ${sel}>${w.name}</option>`;
-              });
-              $('#ward').html(wOptions);
-            });
-          }
-        });
-      }
+    if (stateId) {
+      $('#state').val(stateId);
+      populateSelect('#zone', zonesData[stateId] || [], 'Select zone', zoneId);
     }
-
-    if (authRole === 'zonal_coordinator') {
-      if (lgaId) {
-        $('#lga').val(lgaId);
-        $.get(`/coordinator/lgas/${lgaId}`, function (data) {
-          let wOptions = '<option value="">Select Ward</option>';
-          data.lga.wards.forEach(w => {
-            const sel = w.id == wardId ? 'selected' : '';
-            wOptions += `<option value="${w.id}" ${sel}>${w.name}</option>`;
-          });
-          $('#ward').html(wOptions);
-        });
-      }
+    if (zoneId) {
+      populateSelect('#lga', lgasData[zoneId] || [], 'Select LGA', lgaId);
     }
-
-    if (authRole === 'lga_coordinator') {
-      if (wardId) $('#ward').val(wardId);
+    if (lgaId) {
+      populateSelect('#ward', wardsData[lgaId] || [], 'Select Ward', wardId);
     }
 
     cvrModal.show();
@@ -283,73 +280,43 @@ $(document).ready(function () {
   });
 
   function hideAllLocationFields() {
-    $('#zone-wrapper, #lga-wrapper, #ward-wrapper').addClass('d-none');
+    $('#state-wrapper, #zone-wrapper, #lga-wrapper, #ward-wrapper').addClass('d-none');
   }
 
   function toggleLocationFields(roleName) {
     hideAllLocationFields();
     if (!roleName) return;
-
-    if (authRole === 'state_coordinator') {
-      if (roleName === 'zonal_coordinator') {
-        $('#zone-wrapper').removeClass('d-none');
-      }
-      if (roleName === 'lga_coordinator') {
-        $('#zone-wrapper, #lga-wrapper').removeClass('d-none');
-      }
-      if (roleName === 'ward_coordinator') {
-        $('#zone-wrapper, #lga-wrapper, #ward-wrapper').removeClass('d-none');
-      }
-    }
-
-    if (authRole === 'zonal_coordinator') {
-      if (roleName === 'lga_coordinator') {
-        $('#lga-wrapper').removeClass('d-none');
-      }
-      if (roleName === 'ward_coordinator') {
-        $('#lga-wrapper, #ward-wrapper').removeClass('d-none');
-      }
-    }
-
-    if (authRole === 'lga_coordinator') {
-      if (roleName === 'ward_coordinator') {
-        $('#ward-wrapper').removeClass('d-none');
-      }
-    }
+    if (roleName === 'state_coordinator')  $('#state-wrapper').removeClass('d-none');
+    if (roleName === 'zonal_coordinator')  $('#state-wrapper, #zone-wrapper').removeClass('d-none');
+    if (roleName === 'lga_coordinator')    $('#state-wrapper, #zone-wrapper, #lga-wrapper').removeClass('d-none');
+    if (roleName === 'ward_coordinator')   $('#state-wrapper, #zone-wrapper, #lga-wrapper, #ward-wrapper').removeClass('d-none');
   }
 
-  // ── ZONE CHANGE — AJAX load LGAs (state coordinator) ────
-  $('#zone').on('change', function () {
-    const zoneId = $(this).val();
+  // ── STATE CHANGE ─────────────────────────────────────────
+  $('#state').on('change', function () {
+    const id = $(this).val();
+    $('#zone').html('<option value="">Select zone</option>');
     $('#lga').html('<option value="">Select LGA</option>');
     $('#ward').html('<option value="">Select Ward</option>');
-    if (!zoneId) return;
-
-    $.get(`/coordinator/zones/${zoneId}`, function (data) {
-      let options = '<option value="">Select LGA</option>';
-      data.zone.lgas.forEach(l => {
-        options += `<option value="${l.id}">${l.name}</option>`;
-      });
-      $('#lga').html(options);
-    });
+    if (id) populateSelect('#zone', zonesData[id] || [], 'Select zone');
   });
 
-  // ── LGA CHANGE — AJAX load wards (state/zonal coordinator) ──
-  $('#lga').on('change', function () {
-    const lgaId = $(this).val();
+  // ── ZONE CHANGE ──────────────────────────────────────────
+  $('#zone').on('change', function () {
+    const id = $(this).val();
+    $('#lga').html('<option value="">Select LGA</option>');
     $('#ward').html('<option value="">Select Ward</option>');
-    if (!lgaId) return;
-
-    $.get(`/coordinator/lgas/${lgaId}`, function (data) {
-      let options = '<option value="">Select Ward</option>';
-      data.lga.wards.forEach(w => {
-        options += `<option value="${w.id}">${w.name}</option>`;
-      });
-      $('#ward').html(options);
-    });
+    if (id) populateSelect('#lga', lgasData[id] || [], 'Select LGA');
   });
 
-  // ── SUBMIT (create or update) ────────────────────────────
+  // ── LGA CHANGE ───────────────────────────────────────────
+  $('#lga').on('change', function () {
+    const id = $(this).val();
+    $('#ward').html('<option value="">Select Ward</option>');
+    if (id) populateSelect('#ward', wardsData[id] || [], 'Select Ward');
+  });
+
+  // ── SUBMIT ───────────────────────────────────────────────
   $('#user-form').on('submit', function (e) {
     e.preventDefault();
     const formData = new FormData(this);
@@ -427,6 +394,15 @@ $(document).ready(function () {
   }
 
   // ── HELPERS ──────────────────────────────────────────────
+  function populateSelect(selector, items, label, selectedId = null) {
+    let options = `<option value="">${label}</option>`;
+    items.forEach(item => {
+      const selected = selectedId && item.id == selectedId ? 'selected' : '';
+      options += `<option value="${item.id}" ${selected}>${item.name}</option>`;
+    });
+    $(selector).html(options);
+  }
+
   function clearErrors() {
     $('.is-invalid').removeClass('is-invalid');
     $('.invalid-feedback').text('').hide();

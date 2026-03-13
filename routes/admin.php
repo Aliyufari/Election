@@ -42,10 +42,8 @@ Route::middleware('auth', 'role:admin,super')->group(function () {
 
     /* States */
     Route::get('/admin/states', [StatesController::class, 'index']);
-    Route::get('/admin/states/create', [StatesController::class, 'create']);
-    Route::post('/admin/states/create', [StatesController::class, 'store']);
+    Route::post('/admin/states', [StatesController::class, 'store']);
     Route::get('/admin/states/{state}', [StatesController::class, 'show']);
-    Route::get('/admin/states/{state}/edit', [StatesController::class, 'edit']);
     Route::put('/admin/states/{state}', [StatesController::class, 'update']);
     Route::delete('/admin/states/{state}', [StatesController::class, 'destroy']);
     Route::get('/admin/state/list', [StatesController::class, 'list']);
@@ -54,10 +52,8 @@ Route::middleware('auth', 'role:admin,super')->group(function () {
 
     /* Zones */
     Route::get('/admin/zones', [ZonesController::class, 'index']);
-    Route::get('/admin/zones/create', [ZonesController::class, 'create']);
-    Route::post('/admin/zones/create', [ZonesController::class, 'store']);
+    Route::post('/admin/zones', [ZonesController::class, 'store']);
     Route::get('/admin/zones/{zone}', [ZonesController::class, 'show']);
-    Route::get('/admin/zones/{zone}/edit', [ZonesController::class, 'edit']);
     Route::put('/admin/zones/{zone}', [ZonesController::class, 'update']);
     Route::delete('/admin/zones/{zone}', [ZonesController::class, 'destroy']);
     Route::get('/zones/{zone}/info', [ZonesController::class, 'info']);
@@ -65,20 +61,16 @@ Route::middleware('auth', 'role:admin,super')->group(function () {
 
     /* LGAs */
     Route::get('/admin/lgas', [LgasController::class, 'index']);
-    Route::get('/admin/lgas/create', [LgasController::class, 'create']);
-    Route::post('/admin/lgas/create', [LgasController::class, 'store']);
+    Route::post('/admin/lgas', [LgasController::class, 'store']);
     Route::get('/admin/lgas/{lga}', [LgasController::class, 'show']);
-    Route::get('/admin/lgas/{lga}/edit', [LgasController::class, 'edit']);
     Route::put('/admin/lgas/{lga}', [LgasController::class, 'update']);
     Route::delete('/admin/lgas/{lga}', [LgasController::class, 'destroy']);
     Route::get('/lgas/{lga}/info', [LgasController::class, 'info']);
 
     /* Wards */
     Route::get('/admin/wards', [WardsController::class, 'index']);
-    Route::get('/admin/wards/create', [WardsController::class, 'create']);
-    Route::post('/admin/wards/create', [WardsController::class, 'store']);
+    Route::post('/admin/wards', [WardsController::class, 'store']);
     Route::get('/admin/wards/{ward}', [WardsController::class, 'show']);
-    Route::get('/admin/wards/{ward}/edit', [WardsController::class, 'edit']);
     Route::put('/admin/wards/{ward}', [WardsController::class, 'update']);
     Route::delete('/admin/wards/{ward}', [WardsController::class, 'destroy']);
     Route::get('/wards/{ward}/info', [WardsController::class, 'info']);
@@ -87,10 +79,8 @@ Route::middleware('auth', 'role:admin,super')->group(function () {
 
     /* PUs */
     Route::get('/admin/pus', [PusController::class, 'index']);
-    Route::get('/admin/pus/create', [PusController::class, 'create']);
-    Route::post('/admin/pus/create', [PusController::class, 'store']);
+    Route::post('/admin/pus', [PusController::class, 'store']);
     Route::get('/admin/pus/{pu}', [PusController::class, 'show']);
-    Route::get('/admin/pus/{pu}/edit', [PusController::class, 'edit']);
     Route::put('/admin/pus/{pu}', [PusController::class, 'update']);
     Route::delete('/admin/pus/{pu}', [PusController::class, 'destroy']);
     Route::get('/pus/info', [PusController::class, 'info']);
@@ -99,10 +89,8 @@ Route::middleware('auth', 'role:admin,super')->group(function () {
 
     /* Elections */
     Route::get('/admin/elections', [ElectionsController::class, 'index']);
-    Route::get('/admin/elections/create', [ElectionsController::class, 'create']);
-    Route::post('/admin/elections/create', [ElectionsController::class, 'store']);
+    Route::post('/admin/elections', [ElectionsController::class, 'store']);
     Route::get('/admin/elections/{election}', [ElectionsController::class, 'show']);
-    Route::get('/admin/elections/{election}/edit', [ElectionsController::class, 'edit']);
     Route::put('/admin/elections/{election}', [ElectionsController::class, 'update']);
     Route::delete('/admin/elections/{election}', [ElectionsController::class, 'destroy']);
 
@@ -117,10 +105,8 @@ Route::middleware('auth', 'role:admin,super')->group(function () {
 
     /* Results */
     Route::get('/admin/results', [ResultsController::class, 'index']);
-    Route::get('/admin/results/create', [ResultsController::class, 'create']);
-    Route::post('/admin/results/create', [ResultsController::class, 'store']);
+    Route::post('/admin/results', [ResultsController::class, 'store']);
     Route::get('/admin/results/{result}', [ResultsController::class, 'show']);
-    Route::get('/admin/results/{result}/edit', [ResultsController::class, 'edit']);
     Route::put('/admin/results/{result}', [ResultsController::class, 'update']);
     Route::delete('/admin/results/{result}', [ResultsController::class, 'destroy']);
 

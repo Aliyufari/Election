@@ -30,15 +30,14 @@ class CoordinatorCvrController extends Controller
     public function index()
     {
         $this->authorize('viewAny', Cvr::class);
-
         $user = auth()->user();
 
         $cvrs = Cvr::visibleTo($user)
+            ->with(['pu.ward.lga.zone.state'])
             ->latest()
             ->paginate(20);
 
-        $states = State::with('zones', 'lgas', 'wards', 'pus')->get();
-
+        $states = State::with(['zones.lgas.wards.pus'])->get();
         $coordinator = $user;
 
         return view('coordinator.cvr.index', compact('cvrs', 'states', 'coordinator'));
@@ -134,7 +133,6 @@ class CoordinatorCvrController extends Controller
     public function logins()
     {
         $user = auth()->user();
-
         abort_unless(
             $user->hasAnyRole([
                 'state_coordinator',
@@ -145,47 +143,22 @@ class CoordinatorCvrController extends Controller
             403
         );
 
-        // Users visible to this coordinator
-        $users = User::with(['role', 'state', 'zone', 'lga', 'ward', 'pu'])
+        $users = User::with(['role', 'state', 'zone', 'lga', 'ward'])
             ->visibleTo($user)
             ->latest()
             ->paginate(20);
 
-        // Filter dropdowns dynamically based on user's highest level
-        $states = State::query();
-        $zones  = Zone::query();
-        $lgas   = Lga::query();
-        $wards  = Ward::query();
-        $pus    = Pu::query();
-
-        if ($user->state_id) {
-            $states->where('id', $user->state_id);
-            $zones->where('state_id', $user->state_id);
-            $lgas->where('state_id', $user->state_id);
-            $wards->where('state_id', $user->state_id);
-            $pus->where('state_id', $user->state_id);
-        } elseif ($user->zone_id) {
-            $zones->where('id', $user->zone_id);
-            $lgas->where('zone_id', $user->zone_id);
-            $wards->where('zone_id', $user->zone_id);
-            $pus->where('zone_id', $user->zone_id);
-        } elseif ($user->lga_id) {
-            $lgas->where('id', $user->lga_id);
-            $wards->where('lga_id', $user->lga_id);
-            $pus->where('lga_id', $user->lga_id);
-        } elseif ($user->ward_id) {
-            $wards->where('id', $user->ward_id);
-            $pus->where('ward_id', $user->ward_id);
-        }
+        // Single scoped query replaces all 5 separate queries
+        $states = State::with(['zones.lgas.wards'])
+            ->when($user->state_id, fn($q) => $q->where('id', $user->state_id))
+            ->latest()
+            ->get();
 
         return view('coordinator.cvr.logins', [
-            'users'  => $users,
-            'states' => $states->latest()->get(),
-            'zones'  => $zones->latest()->get(),
-            'lgas'   => $lgas->latest()->get(),
-            'wards'  => $wards->latest()->get(),
-            'pus'    => $pus->latest()->get(),
-            'sn'     => 1,
+            'users'       => $users,
+            'states'      => $states,
+            'coordinator' => $user,
+            'sn'          => 1,
         ]);
     }
 

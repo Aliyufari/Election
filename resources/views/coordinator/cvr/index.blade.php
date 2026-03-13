@@ -19,12 +19,11 @@
         <li class="breadcrumb-item active">CVRs</li>
       </ol>
     </nav>
-  </div><!-- End Page Title -->
+  </div>
 
   <section class="section dashboard">
     <div class="row">
 
-      <!-- CVR List -->
       <div class="col-12">
         <div class="card recent-sales overflow-auto border-0 shadow-sm">
 
@@ -60,7 +59,16 @@
                       <td><span class="badge bg-secondary rounded-pill">{{ $cvr->type }}</span></td>
                       <td><span class="badge bg-success rounded-pill">{{ $cvr->pu?->ward?->name ?? 'N/A' }}</span></td>
                       <td><span class="badge bg-info rounded-pill">{{ $cvr->pu?->name ?? 'N/A' }}</span></td>
-                      <td><span class="badge bg-warning rounded-pill">{{ $cvr->status }}</span></td>
+                      <td>
+                        @php
+                          $statusColor = match($cvr->status) {
+                            'approved' => 'success',
+                            'rejected' => 'danger',
+                            default    => 'warning',
+                          };
+                        @endphp
+                        <span class="badge bg-{{ $statusColor }} rounded-pill">{{ $cvr->status }}</span>
+                      </td>
                       <td class="text-muted small">{{ $cvr->created_at?->format('d M Y, h:i A') ?? 'N/A' }}</td>
                       <td class="text-muted small">{{ $cvr->updated_at?->format('d M Y, h:i A') ?? 'N/A' }}</td>
                       <td class="text-center pe-3">
@@ -94,59 +102,82 @@
               </table>
             </div>
 
-            <!-- Pagination -->
             <div class="d-flex justify-content-between align-items-center mt-4">
               <div class="text-muted small">
                 Showing {{ $cvrs->firstItem() ?? 0 }} to {{ $cvrs->lastItem() ?? 0 }} of {{ $cvrs->total() }} entries
               </div>
-              <div>
-                {{ $cvrs->links() }}
-              </div>
+              <div>{{ $cvrs->links() }}</div>
             </div>
 
           </div>
-
         </div>
-      </div><!-- End CVR List -->
+      </div>
 
     </div>
   </section>
 
-</main><!-- End #main -->
+</main>
 
 @include('coordinator.cvr.add-cvr-modal')
 
 <style>
-  .table > :not(caption) > * > * {
-    padding: 0.75rem 0.5rem;
-  }
-  .btn-group .btn {
-    margin: 0 2px;
-  }
-  .table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-  }
+  .table > :not(caption) > * > * { padding: 0.75rem 0.5rem; }
+  .btn-group .btn { margin: 0 2px; }
+  .table-hover tbody tr:hover { background-color: rgba(0,0,0,0.02); }
 </style>
+@endsection
+
+@section('footer')
+  @include('partials.footer')
 @endsection
 
 @section('script')
 <script>
 $(document).ready(function () {
 
-  const coordinatorData = {
+  $.ajaxSetup({
+    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+  });
+
+  // ── EMBEDDED DATA — no AJAX needed ───────────────────────
+  const zonesData = @json($states->mapWithKeys(fn($s) => [
+    $s->id => $s->zones->map(fn($z) => ['id' => $z->id, 'name' => $z->name])
+  ]));
+  const lgasData = @json($states->flatMap(fn($s) => $s->zones)->mapWithKeys(fn($z) => [
+    $z->id => $z->lgas->map(fn($l) => ['id' => $l->id, 'name' => $l->name])
+  ]));
+  const wardsData = @json($states->flatMap(fn($s) => $s->zones)->flatMap(fn($z) => $z->lgas)->mapWithKeys(fn($l) => [
+    $l->id => $l->wards->map(fn($w) => ['id' => $w->id, 'name' => $w->name])
+  ]));
+  const pusData = @json($states->flatMap(fn($s) => $s->zones)->flatMap(fn($z) => $z->lgas)->flatMap(fn($l) => $l->wards)->mapWithKeys(fn($w) => [
+    $w->id => $w->pus->map(fn($p) => ['id' => $p->id, 'name' => ($p->number . ($p->name ? ' - ' . $p->name : ''))])
+  ]));
+
+  // Coordinator's own location scope
+  const coord = {
     state_id: {{ $coordinator->state_id ?? 'null' }},
     zone_id:  {{ $coordinator->zone_id  ?? 'null' }},
     lga_id:   {{ $coordinator->lga_id   ?? 'null' }},
     ward_id:  {{ $coordinator->ward_id  ?? 'null' }},
   };
 
-  $.ajaxSetup({
-    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-  });
-
   const cvrModalEl = document.getElementById('cvr-modal');
   const cvrModal   = new bootstrap.Modal(cvrModalEl);
   let editingId    = null;
+
+  // ── RESET ON CLOSE ───────────────────────────────────────
+  cvrModalEl.addEventListener('hidden.bs.modal', function () {
+    editingId = null;
+    $('#cvr-form')[0].reset();
+    resetSelect('#zone', 'Select zone');
+    resetSelect('#lga',  'Select LGA');
+    resetSelect('#ward', 'Select ward');
+    resetSelect('#pu',   'Select PU');
+    clearErrors();
+    const focused = document.activeElement;
+    if (focused && cvrModalEl.contains(focused)) focused.blur();
+    $('#create-cvr-btn').trigger('focus');
+  });
 
   // ── OPEN FOR CREATE ──────────────────────────────────────
   $('#create-cvr-btn').on('click', function () {
@@ -156,65 +187,19 @@ $(document).ready(function () {
     $('#cvr-form')[0].reset();
     clearErrors();
 
-    resetSelect('#zone', 'Select zone');
-    resetSelect('#lga',  'Select LGA');
-    resetSelect('#ward', 'Select ward');
-    resetSelect('#pu',   'Select PU');
-
-    // Auto-populate from coordinator's own profile
-    if (coordinatorData.state_id) {
-      $('#state').val(coordinatorData.state_id);
-
-      $.get(`/coordinator/states/${coordinatorData.state_id}`, function (data) {
-        populateSelect('#zone', data.state.zones, 'Select zone', coordinatorData.zone_id);
-
-        // Helper: load wards for a given lga_id
-        const loadWards = function (lgaId) {
-          $.get(`/coordinator/lgas/${lgaId}`, function (data) {
-            populateSelect('#ward', data.lga.wards, 'Select ward', coordinatorData.ward_id);
-
-            if (coordinatorData.ward_id) {
-              $.get(`/coordinator/wards/${coordinatorData.ward_id}`, function (data) {
-                populateSelect('#pu', data.ward.pus, 'Select PU');
-              });
-            }
-          });
-        };
-
-        // Helper: load LGAs for a given zone_id, then continue to wards
-        const loadLgas = function (zoneId) {
-          $.get(`/coordinator/zones/${zoneId}`, function (data) {
-            populateSelect('#lga', data.zone.lgas, 'Select LGA', coordinatorData.lga_id);
-
-            if (coordinatorData.lga_id) {
-              loadWards(coordinatorData.lga_id);
-            }
-          });
-        };
-
-        if (coordinatorData.zone_id) {
-          // Zone is known — go straight through
-          loadLgas(coordinatorData.zone_id);
-
-        } else if (coordinatorData.lga_id) {
-          // Zone unknown — derive it from the LGA
-          $.get(`/coordinator/lgas/${coordinatorData.lga_id}`, function (data) {
-            const derivedZoneId = data.lga.zone_id ?? null;
-
-            if (derivedZoneId) {
-              $('#zone').val(derivedZoneId);
-              // Now load LGAs for that zone so the zone dropdown is also populated
-              $.get(`/coordinator/zones/${derivedZoneId}`, function (data) {
-                populateSelect('#lga', data.zone.lgas, 'Select LGA', coordinatorData.lga_id);
-                loadWards(coordinatorData.lga_id);
-              });
-            } else {
-              // Can't determine zone — just load wards directly
-              loadWards(coordinatorData.lga_id);
-            }
-          });
-        }
-      });
+    // Pre-fill from coordinator's scope using embedded data
+    if (coord.state_id) {
+      $('#state').val(coord.state_id);
+      populateSelect('#zone', zonesData[coord.state_id] || [], 'Select zone', coord.zone_id);
+    }
+    if (coord.zone_id) {
+      populateSelect('#lga', lgasData[coord.zone_id] || [], 'Select LGA', coord.lga_id);
+    }
+    if (coord.lga_id) {
+      populateSelect('#ward', wardsData[coord.lga_id] || [], 'Select ward', coord.ward_id);
+    }
+    if (coord.ward_id) {
+      populateSelect('#pu', pusData[coord.ward_id] || [], 'Select PU');
     }
 
     cvrModal.show();
@@ -222,8 +207,13 @@ $(document).ready(function () {
 
   // ── OPEN FOR EDIT ────────────────────────────────────────
   $(document).on('click', '.edit-cvr-btn', function () {
-    const btn = $(this);
-    editingId = btn.data('id');
+    const btn     = $(this);
+    editingId     = btn.data('id');
+    const stateId = btn.data('state_id');
+    const zoneId  = btn.data('zone_id');
+    const lgaId   = btn.data('lga_id');
+    const wardId  = btn.data('ward_id');
+    const puId    = btn.data('pu_id');
 
     $('#cvr-modal-title').text('Edit CVR');
     $('#cvr-submit-btn').text('Update CVR');
@@ -232,41 +222,45 @@ $(document).ready(function () {
     $('#unique_id').val(btn.data('unique_id'));
     $('#type').val(btn.data('type'));
     $('#status').val(btn.data('status'));
+    $('#state').val(stateId);
 
-    const stateId = btn.data('state_id');
-    const zoneId  = btn.data('zone_id');
-    const lgaId   = btn.data('lga_id');
-    const wardId  = btn.data('ward_id');
-    const puId    = btn.data('pu_id');
+    populateSelect('#zone', zonesData[stateId] || [], 'Select zone', zoneId);
+    populateSelect('#lga',  lgasData[zoneId]   || [], 'Select LGA',  lgaId);
+    populateSelect('#ward', wardsData[lgaId]   || [], 'Select ward', wardId);
+    populateSelect('#pu',   pusData[wardId]    || [], 'Select PU',   puId);
 
+    cvrModal.show();
+  });
+
+  // ── MODAL CASCADING SELECTS ──────────────────────────────
+  $('#state').on('change', function () {
+    const id = $(this).val();
     resetSelect('#zone', 'Select zone');
     resetSelect('#lga',  'Select LGA');
     resetSelect('#ward', 'Select ward');
     resetSelect('#pu',   'Select PU');
+    if (id) populateSelect('#zone', zonesData[id] || [], 'Select zone');
+  });
 
-    if (stateId) {
-      $('#state').val(stateId);
-      $.get(`/coordinator/states/${stateId}`, function (data) {
-        populateSelect('#zone', data.state.zones, 'Select zone', zoneId);
-        if (zoneId) {
-          $.get(`/coordinator/zones/${zoneId}`, function (data) {
-            populateSelect('#lga', data.zone.lgas, 'Select LGA', lgaId);
-            if (lgaId) {
-              $.get(`/coordinator/lgas/${lgaId}`, function (data) {
-                populateSelect('#ward', data.lga.wards, 'Select ward', wardId);
-                if (wardId) {
-                  $.get(`/coordinator/wards/${wardId}`, function (data) {
-                    populateSelect('#pu', data.ward.pus, 'Select PU', puId);
-                  });
-                }
-              });
-            }
-          });
-        }
-      });
-    }
+  $('#zone').on('change', function () {
+    const id = $(this).val();
+    resetSelect('#lga',  'Select LGA');
+    resetSelect('#ward', 'Select ward');
+    resetSelect('#pu',   'Select PU');
+    if (id) populateSelect('#lga', lgasData[id] || [], 'Select LGA');
+  });
 
-    cvrModal.show();
+  $('#lga').on('change', function () {
+    const id = $(this).val();
+    resetSelect('#ward', 'Select ward');
+    resetSelect('#pu',   'Select PU');
+    if (id) populateSelect('#ward', wardsData[id] || [], 'Select ward');
+  });
+
+  $('#ward').on('change', function () {
+    const id = $(this).val();
+    resetSelect('#pu', 'Select PU');
+    if (id) populateSelect('#pu', pusData[id] || [], 'Select PU');
   });
 
   // ── SUBMIT (create or update) ────────────────────────────
@@ -359,49 +353,6 @@ $(document).ready(function () {
     }
   }
 
-  // ── CASCADING SELECTS ────────────────────────────────────
-  $('#state').on('change', function () {
-    resetSelect('#zone', 'Select zone');
-    resetSelect('#lga',  'Select LGA');
-    resetSelect('#ward', 'Select ward');
-    resetSelect('#pu',   'Select PU');
-    const id = $(this).val();
-    if (!id) return;
-    $.get(`/coordinator/states/${id}`, function (data) {
-      populateSelect('#zone', data.state.zones, 'Select zone');
-    });
-  });
-
-  $('#zone').on('change', function () {
-    resetSelect('#lga',  'Select LGA');
-    resetSelect('#ward', 'Select ward');
-    resetSelect('#pu',   'Select PU');
-    const id = $(this).val();
-    if (!id) return;
-    $.get(`/coordinator/zones/${id}`, function (data) {
-      populateSelect('#lga', data.zone.lgas, 'Select LGA');
-    });
-  });
-
-  $('#lga').on('change', function () {
-    resetSelect('#ward', 'Select ward');
-    resetSelect('#pu',   'Select PU');
-    const id = $(this).val();
-    if (!id) return;
-    $.get(`/coordinator/lgas/${id}`, function (data) {
-      populateSelect('#ward', data.lga.wards, 'Select ward');
-    });
-  });
-
-  $('#ward').on('change', function () {
-    resetSelect('#pu', 'Select PU');
-    const id = $(this).val();
-    if (!id) return;
-    $.get(`/coordinator/wards/${id}`, function (data) {
-      populateSelect('#pu', data.ward.pus, 'Select PU');
-    });
-  });
-
   // ── HELPERS ──────────────────────────────────────────────
   function populateSelect(selector, items, label, selectedId = null) {
     let options = `<option value="">${label}</option>`;
@@ -427,10 +378,6 @@ $(document).ready(function () {
 
 });
 </script>
-@endsection
-
-@section('footer')
-  @include('partials.footer')
 @endsection
 
 @section('toast')

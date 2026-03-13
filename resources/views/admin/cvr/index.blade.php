@@ -58,11 +58,13 @@
                   <label class="form-label small">Zone</label>
                   <select class="form-select form-select-sm" name="zone_id" id="filter-zone">
                     <option value="">All Zones</option>
-                    @foreach($zones as $zone)
-                      <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
-                        {{ $zone->name }}
-                      </option>
-                    @endforeach
+                    @if(request('state_id'))
+                      @foreach($states->firstWhere('id', request('state_id'))?->zones ?? [] as $zone)
+                        <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
+                          {{ $zone->name }}
+                        </option>
+                      @endforeach
+                    @endif
                   </select>
                 </div>
 
@@ -70,11 +72,13 @@
                   <label class="form-label small">LGA</label>
                   <select class="form-select form-select-sm" name="lga_id" id="filter-lga">
                     <option value="">All LGAs</option>
-                    @foreach($lgas as $lga)
-                      <option value="{{ $lga->id }}" {{ request('lga_id') == $lga->id ? 'selected' : '' }}>
-                        {{ $lga->name }}
-                      </option>
-                    @endforeach
+                    @if(request('zone_id'))
+                      @foreach($states->flatMap(fn($s) => $s->zones)->firstWhere('id', request('zone_id'))?->lgas ?? [] as $lga)
+                        <option value="{{ $lga->id }}" {{ request('lga_id') == $lga->id ? 'selected' : '' }}>
+                          {{ $lga->name }}
+                        </option>
+                      @endforeach
+                    @endif
                   </select>
                 </div>
 
@@ -82,11 +86,13 @@
                   <label class="form-label small">Ward</label>
                   <select class="form-select form-select-sm" name="ward_id" id="filter-ward">
                     <option value="">All Wards</option>
-                    @foreach($wards as $ward)
-                      <option value="{{ $ward->id }}" {{ request('ward_id') == $ward->id ? 'selected' : '' }}>
-                        {{ $ward->name }}
-                      </option>
-                    @endforeach
+                    @if(request('lga_id'))
+                      @foreach($states->flatMap(fn($s) => $s->zones)->flatMap(fn($z) => $z->lgas)->firstWhere('id', request('lga_id'))?->wards ?? [] as $ward)
+                        <option value="{{ $ward->id }}" {{ request('ward_id') == $ward->id ? 'selected' : '' }}>
+                          {{ $ward->name }}
+                        </option>
+                      @endforeach
+                    @endif
                   </select>
                 </div>
 
@@ -239,111 +245,17 @@
 </main>
 
 <!-- CVR Modal -->
-<div class="modal fade" id="cvr-modal" tabindex="-1" aria-labelledby="cvr-modal-title" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content border-0 shadow-sm">
-
-      <div class="modal-header">
-        <h5 class="modal-title" id="cvr-modal-title">Create CVR</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        <form id="cvr-form" novalidate>
-          @csrf
-
-          <div class="row g-3">
-
-            <div class="col-md-6">
-              <label class="form-label">CVR Unique ID</label>
-              <input type="text" class="form-control" id="unique_id" name="unique_id">
-              <div class="invalid-feedback" id="unique_id-error"></div>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">CVR Type</label>
-              <select class="form-select" name="type" id="type">
-                <option value="">Select type</option>
-                <option value="registration">Registration</option>
-                <option value="transfer">Transfer</option>
-                <option value="update">Update</option>
-              </select>
-              <div class="invalid-feedback" id="type-error"></div>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label">State</label>
-              <select class="form-select" id="state" name="state_id">
-                <option value="">Select state</option>
-                @foreach($states as $state)
-                  <option value="{{ $state->id }}">{{ $state->name }}</option>
-                @endforeach
-              </select>
-              <div class="invalid-feedback" id="state-error"></div>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label">Zone</label>
-              <select class="form-select" id="zone" name="zone_id" disabled>
-                <option value="">Select zone</option>
-              </select>
-              <div class="invalid-feedback" id="zone-error"></div>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label">LGA</label>
-              <select class="form-select" id="lga" name="lga_id" disabled>
-                <option value="">Select LGA</option>
-              </select>
-              <div class="invalid-feedback" id="lga-error"></div>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label">Ward</label>
-              <select class="form-select" id="ward" name="ward_id" disabled>
-                <option value="">Select ward</option>
-              </select>
-              <div class="invalid-feedback" id="ward-error"></div>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label">Polling Unit</label>
-              <select class="form-select" id="pu" name="pu_id" disabled>
-                <option value="">Select PU</option>
-              </select>
-              <div class="invalid-feedback" id="pu-error"></div>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label">Status</label>
-              <select class="form-select" name="status" id="status">
-                <option value="">Select status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-              </select>
-              <div class="invalid-feedback" id="status-error"></div>
-            </div>
-
-          </div>
-
-          <div class="mt-4 d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-primary" id="cvr-submit-btn">Save CVR</button>
-            <button type="button" class="btn btn-secondary" id="cvr-cancel-btn">Cancel</button>
-          </div>
-
-        </form>
-      </div>
-
-    </div>
-  </div>
-</div>
+@include('admin.cvr.add-cvr-modal')
 
 <style>
   .table > :not(caption) > * > * { padding: 0.75rem 0.5rem; }
   .btn-group .btn { margin: 0 2px; }
   .table-hover tbody tr:hover { background-color: rgba(0,0,0,0.02); }
 </style>
+@endsection
+
+@section('footer')
+  @include('partials.footer')
 @endsection
 
 @section('script')
@@ -354,11 +266,25 @@ $(document).ready(function () {
     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
   });
 
+  // ── EMBEDDED DATA — no AJAX needed ───────────────────────
+  const zonesData = @json($states->mapWithKeys(fn($s) => [
+    $s->id => $s->zones->map(fn($z) => ['id' => $z->id, 'name' => $z->name])
+  ]));
+  const lgasData = @json($states->flatMap(fn($s) => $s->zones)->mapWithKeys(fn($z) => [
+    $z->id => $z->lgas->map(fn($l) => ['id' => $l->id, 'name' => $l->name])
+  ]));
+  const wardsData = @json($states->flatMap(fn($s) => $s->zones)->flatMap(fn($z) => $z->lgas)->mapWithKeys(fn($l) => [
+    $l->id => $l->wards->map(fn($w) => ['id' => $w->id, 'name' => $w->name])
+  ]));
+  const pusData = @json($states->flatMap(fn($s) => $s->zones)->flatMap(fn($z) => $z->lgas)->flatMap(fn($l) => $l->wards)->mapWithKeys(fn($w) => [
+    $w->id => $w->pus->map(fn($p) => ['id' => $p->id, 'name' => ($p->number . ($p->name ? ' - ' . $p->name : ''))])
+  ]));
+
   const cvrModalEl = document.getElementById('cvr-modal');
   const cvrModal   = new bootstrap.Modal(cvrModalEl);
   let editingId    = null;
 
-  // ── CANCEL BUTTON — fix aria-hidden warning ──────────────
+  // ── CANCEL BUTTON ────────────────────────────────────────
   $('#cvr-cancel-btn').on('click', function () {
     $(this).blur();
     cvrModal.hide();
@@ -409,35 +335,64 @@ $(document).ready(function () {
     $('#unique_id').val(btn.data('unique_id'));
     $('#type').val(btn.data('type'));
     $('#status').val(btn.data('status'));
+    $('#state').val(stateId);
 
+    populateSelect('#zone', zonesData[stateId] || [], 'Select zone', zoneId);
+    populateSelect('#lga',  lgasData[zoneId]   || [], 'Select LGA',  lgaId);
+    populateSelect('#ward', wardsData[lgaId]   || [], 'Select ward', wardId);
+    populateSelect('#pu',   pusData[wardId]    || [], 'Select PU',   puId);
+
+    cvrModal.show();
+  });
+
+  // ── MODAL CASCADING SELECTS ──────────────────────────────
+  $('#state').on('change', function () {
+    const id = $(this).val();
     resetSelect('#zone', 'Select zone');
     resetSelect('#lga',  'Select LGA');
     resetSelect('#ward', 'Select ward');
     resetSelect('#pu',   'Select PU');
+    if (id) populateSelect('#zone', zonesData[id] || [], 'Select zone');
+  });
 
-    if (stateId) {
-      $('#state').val(stateId);
-      $.get(`/admin/states/${stateId}`, function (data) {
-        populateSelect('#zone', data.state.zones, 'Select zone', zoneId);
-        if (zoneId) {
-          $.get(`/admin/zones/${zoneId}`, function (data) {
-            populateSelect('#lga', data.zone.lgas, 'Select LGA', lgaId);
-            if (lgaId) {
-              $.get(`/admin/lgas/${lgaId}`, function (data) {
-                populateSelect('#ward', data.lga.wards, 'Select ward', wardId);
-                if (wardId) {
-                  $.get(`/admin/wards/${wardId}`, function (data) {
-                    populateSelect('#pu', data.ward.pus, 'Select PU', puId);
-                  });
-                }
-              });
-            }
-          });
-        }
-      });
-    }
+  $('#zone').on('change', function () {
+    const id = $(this).val();
+    resetSelect('#lga',  'Select LGA');
+    resetSelect('#ward', 'Select ward');
+    resetSelect('#pu',   'Select PU');
+    if (id) populateSelect('#lga', lgasData[id] || [], 'Select LGA');
+  });
 
-    cvrModal.show();
+  $('#lga').on('change', function () {
+    const id = $(this).val();
+    resetSelect('#ward', 'Select ward');
+    resetSelect('#pu',   'Select PU');
+    if (id) populateSelect('#ward', wardsData[id] || [], 'Select ward');
+  });
+
+  $('#ward').on('change', function () {
+    const id = $(this).val();
+    resetSelect('#pu', 'Select PU');
+    if (id) populateSelect('#pu', pusData[id] || [], 'Select PU');
+  });
+
+  // ── FILTER BAR CASCADING ─────────────────────────────────
+  $('#filter-state').on('change', function () {
+    const id = $(this).val();
+    populateFilterSelect('#filter-zone', zonesData[id] || [], 'All Zones');
+    $('#filter-lga').html('<option value="">All LGAs</option>');
+    $('#filter-ward').html('<option value="">All Wards</option>');
+  });
+
+  $('#filter-zone').on('change', function () {
+    const id = $(this).val();
+    populateFilterSelect('#filter-lga', lgasData[id] || [], 'All LGAs');
+    $('#filter-ward').html('<option value="">All Wards</option>');
+  });
+
+  $('#filter-lga').on('change', function () {
+    const id = $(this).val();
+    populateFilterSelect('#filter-ward', wardsData[id] || [], 'All Wards');
   });
 
   // ── SUBMIT (create or update) ────────────────────────────
@@ -530,89 +485,6 @@ $(document).ready(function () {
     }
   }
 
-  // ── FILTER — cascading zone/lga/ward on filter bar ───────
-  $('#filter-state').on('change', function () {
-    const stateId = $(this).val();
-    $('#filter-zone').html('<option value="">All Zones</option>');
-    $('#filter-lga').html('<option value="">All LGAs</option>');
-    $('#filter-ward').html('<option value="">All Wards</option>');
-    if (!stateId) return;
-
-    $.get(`/admin/states/${stateId}`, function (data) {
-      data.state.zones.forEach(z => {
-        $('#filter-zone').append(`<option value="${z.id}">${z.name}</option>`);
-      });
-    });
-  });
-
-  $('#filter-zone').on('change', function () {
-    const zoneId = $(this).val();
-    $('#filter-lga').html('<option value="">All LGAs</option>');
-    $('#filter-ward').html('<option value="">All Wards</option>');
-    if (!zoneId) return;
-
-    $.get(`/admin/zones/${zoneId}`, function (data) {
-      data.zone.lgas.forEach(l => {
-        $('#filter-lga').append(`<option value="${l.id}">${l.name}</option>`);
-      });
-    });
-  });
-
-  $('#filter-lga').on('change', function () {
-    const lgaId = $(this).val();
-    $('#filter-ward').html('<option value="">All Wards</option>');
-    if (!lgaId) return;
-
-    $.get(`/admin/lgas/${lgaId}`, function (data) {
-      data.lga.wards.forEach(w => {
-        $('#filter-ward').append(`<option value="${w.id}">${w.name}</option>`);
-      });
-    });
-  });
-
-  // ── MODAL CASCADING SELECTS ──────────────────────────────
-  $('#state').on('change', function () {
-    resetSelect('#zone', 'Select zone');
-    resetSelect('#lga',  'Select LGA');
-    resetSelect('#ward', 'Select ward');
-    resetSelect('#pu',   'Select PU');
-    const id = $(this).val();
-    if (!id) return;
-    $.get(`/admin/states/${id}`, function (data) {
-      populateSelect('#zone', data.state.zones, 'Select zone');
-    });
-  });
-
-  $('#zone').on('change', function () {
-    resetSelect('#lga',  'Select LGA');
-    resetSelect('#ward', 'Select ward');
-    resetSelect('#pu',   'Select PU');
-    const id = $(this).val();
-    if (!id) return;
-    $.get(`/admin/zones/${id}`, function (data) {
-      populateSelect('#lga', data.zone.lgas, 'Select LGA');
-    });
-  });
-
-  $('#lga').on('change', function () {
-    resetSelect('#ward', 'Select ward');
-    resetSelect('#pu',   'Select PU');
-    const id = $(this).val();
-    if (!id) return;
-    $.get(`/admin/lgas/${id}`, function (data) {
-      populateSelect('#ward', data.lga.wards, 'Select ward');
-    });
-  });
-
-  $('#ward').on('change', function () {
-    resetSelect('#pu', 'Select PU');
-    const id = $(this).val();
-    if (!id) return;
-    $.get(`/admin/wards/${id}`, function (data) {
-      populateSelect('#pu', data.ward.pus, 'Select PU');
-    });
-  });
-
   // ── HELPERS ──────────────────────────────────────────────
   function populateSelect(selector, items, label, selectedId = null) {
     let options = `<option value="">${label}</option>`;
@@ -621,6 +493,14 @@ $(document).ready(function () {
       options += `<option value="${item.id}" ${selected}>${item.name}</option>`;
     });
     $(selector).html(options).prop('disabled', false);
+  }
+
+  function populateFilterSelect(selector, items, label) {
+    let options = `<option value="">${label}</option>`;
+    items.forEach(item => {
+      options += `<option value="${item.id}">${item.name}</option>`;
+    });
+    $(selector).html(options);
   }
 
   function resetSelect(selector, label) {
@@ -638,10 +518,6 @@ $(document).ready(function () {
 
 });
 </script>
-@endsection
-
-@section('footer')
-  @include('partials.footer')
 @endsection
 
 @section('toast')

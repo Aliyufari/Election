@@ -21,14 +21,18 @@ class StatesController extends Controller
 
     public function index()
     {
+        $state = State::with(['lgas', 'users', 'wards', 'pus', 'zones'])
+            ->latest()
+            ->paginate(20);
+
         if (request()->expectsJson()) {
             return response()->json([
-                'states' => State::latest()->get(),
+                'states' => $state,
             ]);
         }
 
         return view('admin.states.index', [
-            'states' => State::latest()->paginate(10),
+            'states' => $state,
             'sn'     => 1,
         ]);
     }
@@ -45,13 +49,7 @@ class StatesController extends Controller
     {
         $state->load(['lgas', 'users', 'wards', 'pus', 'zones']);
 
-        if (request()->wantsJson() || request()->expectsJson()) {
-            return response()->json(['state' => $state]);
-        }
-
-        return view('admin.states.show', [
-            'state' => $state,
-        ]);
+        return response()->json(['state' => $state]);
     }
 
     public function info(State $state)
@@ -94,59 +92,34 @@ class StatesController extends Controller
         ]);
     }
 
-    public function create()
-    {
-
-        return view('admin.states.create', [
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
-        ]);
-    }
-
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => ['required', 'min:3', Rule::unique('states', 'name')],
-            'description' => ['required', 'min:24'],
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
-        State::create($data);
+        State::create($validated);
 
-        return redirect('/admin/states')->with('success', 'State created successfully!');
-    }
-
-    public function edit(State $state)
-    {
-
-        return view('admin.states.edit', [
-            'state' => $state,
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
-        ]);
+        return response()->json(['status' => true, 'message' => 'State created successfully.']);
     }
 
     public function update(Request $request, State $state)
     {
-        $data = $request->validate([
-            'name' => ['required', 'min:3'],
-            'description' => ['required', 'min:24'],
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
-        $state->update($data);
+        $state->update($validated);
 
-        return redirect('/admin/states')->with('success', 'State updated successfully!');
+        return response()->json(['status' => true, 'message' => 'State updated successfully.']);
     }
 
     public function destroy(State $state)
     {
         $state->delete();
 
-        return redirect('/admin/states')->with('success', 'State deleted successfully!');
+        return response()->json(['status' => true, 'message' => 'State deleted successfully.']);
     }
 }

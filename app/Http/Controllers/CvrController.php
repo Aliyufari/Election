@@ -27,7 +27,6 @@ class CvrController extends Controller
             'pu.ward.lga.zone.state',
         ])->latest();
 
-        // Filters
         if ($request->filled('state_id')) {
             $query->whereHas('pu', fn($q) => $q->where('state_id', $request->state_id));
         }
@@ -49,19 +48,8 @@ class CvrController extends Controller
 
         return view('admin.cvr.index', [
             'cvrs'   => $query->paginate(20)->withQueryString(),
-            'states' => State::latest()->get(),
-            'zones'  => Zone::when(
-                $request->filled('state_id'),
-                fn($q) => $q->where('state_id', $request->state_id)
-            )->latest()->get(),
-            'lgas'   => Lga::when(
-                $request->filled('zone_id'),
-                fn($q) => $q->where('zone_id', $request->zone_id)
-            )->latest()->get(),
-            'wards'  => Ward::when(
-                $request->filled('lga_id'),
-                fn($q) => $q->where('lga_id', $request->lga_id)
-            )->latest()->get(),
+            'states' => State::with(['zones.lgas.wards.pus'])->latest()->get(),
+            'sn'     => 1,
         ]);
     }
 
@@ -291,23 +279,16 @@ class CvrController extends Controller
     public function logins()
     {
         return view('admin.cvr.logins', [
-            'users' => User::with('role')
-                ->whereHas('role', function ($query) {
-                    $query->whereIn('name', [
-                        'state_coordinator',
-                        'zonal_coordinator',
-                        'lga_coordinator',
-                        'ward_coordinator'
-                    ]);
-                })
+            'users' => User::with(['role', 'state', 'zone', 'lga', 'ward'])
+                ->whereHas('role', fn($q) => $q->whereIn('name', [
+                    'state_coordinator',
+                    'zonal_coordinator',
+                    'lga_coordinator',
+                    'ward_coordinator',
+                ]))
                 ->latest()
                 ->paginate(20),
-
-            'states' => State::latest()->get(),
-            'zones'  => Zone::latest()->get(),
-            'lgas'   => Lga::latest()->get(),
-            'wards'  => Ward::latest()->get(),
-            'pus'    => Pu::latest()->get(),
+            'states' => State::with(['zones.lgas.wards'])->latest()->get(),
             'sn'     => 1,
         ]);
     }

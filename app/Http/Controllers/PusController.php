@@ -21,81 +21,66 @@ class PusController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(Pu $pu)
+    public function index()
     {
+        $pus = Pu::with(['state', 'zone', 'lga', 'ward'])
+            ->latest()
+            ->paginate(20);
         return view('admin.pus.index', [
-            'pus' => $pu->latest()->paginate(10),
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
+            'pus' => $pus,
+            'states' => State::with(['zones.lgas.wards'])
+                ->latest()
+                ->get(),
             'sn' => 1,
-        ]);
-    }
-
-    public function create()
-    {
-        return view('admin.pus.create', [
-            'states' => State::latest()->get(),
-            'elections' => Election::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
         ]);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'number' => ['required', Rule::unique('pus', 'number')],
-            'state_id' => ['required'],
-            'zone_id' => ['required'],
-            'lga_id' => ['required'],
-            'ward_id' => ['required'],
+            'number'      => ['required', Rule::unique('pus', 'number')],
+            'name'        => ['required', 'min:3'],
+            'state_id'    => ['required', 'exists:states,id'],
+            'zone_id'     => ['required', 'exists:zones,id'],
+            'lga_id'      => ['required', 'exists:lgas,id'],
+            'ward_id'     => ['required', 'exists:wards,id'],
+            'description' => ['nullable', 'string'],
         ]);
 
         Pu::create($data);
 
-        return redirect('/admin/pus')->with('success', 'PU created successfully!');
+        return response()->json(['status' => true, 'message' => 'Polling unit created successfully.']);
     }
 
-    public function show(Pu $pu) {}
-
-    public function edit(Pu $pu)
+    public function show(Pu $pu)
     {
-        return view('admin.pus.edit', [
-            'pu' => $pu,
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
+        return response()->json([
+            'pu' => $pu->load(['state', 'zone', 'lga', 'ward'])
         ]);
     }
 
     public function update(Request $request, Pu $pu)
     {
         $data = $request->validate([
-            'number' => ['required'],
-            'name' => ['required', 'min:3'],
-            'state_id' => ['required'],
-            'zone_id' => ['required'],
-            'lga_id' => ['required'],
-            'ward_id' => ['required'],
-            'description' => ['required', 'min:24'],
+            'number'      => ['required', Rule::unique('pus', 'number')->ignore($pu->id)],
+            'name'        => ['required', 'min:3'],
+            'state_id'    => ['required', 'exists:states,id'],
+            'zone_id'     => ['required', 'exists:zones,id'],
+            'lga_id'      => ['required', 'exists:lgas,id'],
+            'ward_id'     => ['required', 'exists:wards,id'],
+            'description' => ['nullable', 'string'],
         ]);
 
         $pu->update($data);
 
-        return redirect('/admin/pus')->with('success', 'PU updated successfully!');
+        return response()->json(['status' => true, 'message' => 'Polling unit updated successfully.']);
     }
 
     public function destroy(Pu $pu)
     {
         $pu->delete();
 
-        return redirect('/admin/pus')->with('success', 'PU deleted successfully!');
+        return response()->json(['status' => true, 'message' => 'Polling unit deleted successfully.']);
     }
 
     public function registrations(Request $request, Pu $pu)

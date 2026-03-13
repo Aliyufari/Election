@@ -20,13 +20,13 @@ class LgasController extends Controller
 
     public function index(Lga $lga)
     {
+        $lgas = Lga::with(['state', 'zone', 'wards', 'pus', 'users'])
+            ->latest()
+            ->paginate(20);
 
         return view('admin.lgas.index', [
-            'lgas' => $lga->latest()->paginate(10),
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
+            'lgas' => $lgas,
+            'states' => State::with(['zones'])->latest()->get(),
             'sn' => 1,
         ]);
     }
@@ -44,69 +44,45 @@ class LgasController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return view('admin.lgas.create', [
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
-        ]);
-    }
-
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => ['required', 'min:3', Rule::unique('lgas', 'name')],
-            'state_id' => ['required'],
-            'zone_id' => ['required'],
-            'description' => ['required', 'min:24'],
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'state_id'    => 'required|exists:states,id',
+            'zone_id'     => 'required|exists:zones,id',
+            'description' => 'nullable|string',
         ]);
 
-        Lga::create($data);
+        Lga::create($validated);
 
-        return redirect('/admin/lgas')->with('success', 'LGA created successfully!');
+        return response()->json(['status' => true, 'message' => 'LGA created successfully.']);
     }
 
     public function show(Lga $lga)
     {
         return response()->json([
-            'lga' => $lga->load('wards')
-        ]);
-    }
-
-    public function edit(Lga $lga)
-    {
-
-        return view('admin.lgas.edit', [
-            'lga' => $lga,
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
+            'lga' => $lga->load(['state', 'zone', 'wards'])
         ]);
     }
 
     public function update(Request $request, Lga $lga)
     {
-        $data = $request->validate([
-            'name' => ['required', 'min:3'],
-            'state_id' => ['required'],
-            'zone_id' => ['required'],
-            'description' => ['required', 'min:24'],
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'state_id'    => 'required|exists:states,id',
+            'zone_id'     => 'required|exists:zones,id',
+            'description' => 'nullable|string',
         ]);
 
-        $lga->update($data);
+        $lga->update($validated);
 
-        return redirect('/admin/lgas')->with('success', 'LGA updated successfully!');
+        return response()->json(['status' => true, 'message' => 'LGA updated successfully.']);
     }
 
     public function destroy(Lga $lga)
     {
         $lga->delete();
 
-        return redirect('/admin/lgas')->with('success', 'LGA deleted successfully!');
+        return response()->json(['status' => true, 'message' => 'LGA deleted successfully.']);
     }
 }

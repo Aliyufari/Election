@@ -19,14 +19,16 @@ class WardsController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(Ward $ward)
+    public function index()
     {
+        $wards = Ward::with(['state', 'zone', 'lga', 'pus'])
+            ->latest()
+            ->paginate(20);
         return view('admin.wards.index', [
-            'wards' => $ward->latest()->paginate(10),
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'pus' => Pu::latest()->get(),
+            'wards' => $wards,
+            'states' => State::with(['zones.lgas'])
+                ->latest()
+                ->get(),
             'sn' => 1,
         ]);
     }
@@ -44,72 +46,48 @@ class WardsController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return view('admin.wards.create', [
-            'states' => State::latest()->get(),
-            'elections' => Election::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
-        ]);
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required', 'min:3', Rule::unique('wards', 'name')],
-            'state_id' => ['required'],
-            'zone_id' => ['required'],
-            'lga_id' => ['required'],
-            'description' => [],
+            'name'        => ['required', 'min:3', Rule::unique('wards', 'name')],
+            'state_id'    => ['required', 'exists:states,id'],
+            'zone_id'     => ['required', 'exists:zones,id'],
+            'lga_id'      => ['required', 'exists:lgas,id'],
+            'description' => ['nullable', 'string'],
         ]);
 
         Ward::create($data);
 
-        return redirect('/admin/wards')->with('success', 'Ward created successfully!');
+        return response()->json(['status' => true, 'message' => 'Ward created successfully.']);
     }
 
     public function show(Ward $ward)
     {
         return response()->json([
-            'ward' => $ward->load('pus')
-        ]);
-    }
-
-    public function edit(Ward $ward)
-    {
-        return view('admin.wards.edit', [
-            'ward' => $ward,
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
+            'ward' => $ward->load(['state', 'zone', 'lga'])
         ]);
     }
 
     public function update(Request $request, Ward $ward)
     {
         $data = $request->validate([
-            'name' => ['required', 'min:3'],
-            'state' => ['required'],
-            'zone' => ['required'],
-            'lga' => ['required'],
-            'description' => ['required', 'min:24'],
+            'name'        => ['required', 'min:3', Rule::unique('wards', 'name')->ignore($ward->id)],
+            'state_id'    => ['required', 'exists:states,id'],
+            'zone_id'     => ['required', 'exists:zones,id'],
+            'lga_id'      => ['required', 'exists:lgas,id'],
+            'description' => ['nullable', 'string'],
         ]);
 
         $ward->update($data);
 
-        return redirect('/admin/wards')->with('success', 'Ward updated successfully!');
+        return response()->json(['status' => true, 'message' => 'Ward updated successfully.']);
     }
 
     public function destroy(Ward $ward)
     {
         $ward->delete();
 
-        return redirect('/admin/wards')->with('success', 'Ward deleted successfully!');
+        return response()->json(['status' => true, 'message' => 'Ward deleted successfully.']);
     }
 
     public function accreditations(Request $request, Ward $ward)

@@ -69,9 +69,7 @@
                         </span>
                       </td>
                       <td>{{ $user->email }}</td>
-                      <td>
-                        <span class="badge bg-secondary rounded-pill">{{ $user->gender }}</span>
-                      </td>
+                      <td><span class="badge bg-secondary rounded-pill">{{ $user->gender }}</span></td>
                       <td>
                         @if($user->state)
                           <span class="badge bg-dark rounded-pill">{{ $user->state->name }}</span>
@@ -170,6 +168,17 @@ $(document).ready(function () {
     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
   });
 
+  // ── EMBEDDED DATA — no AJAX needed ───────────────────────
+  const zonesData = @json($states->mapWithKeys(fn($s) => [
+    $s->id => $s->zones->map(fn($z) => ['id' => $z->id, 'name' => $z->name])
+  ]));
+  const lgasData = @json($states->flatMap(fn($s) => $s->zones)->mapWithKeys(fn($z) => [
+    $z->id => $z->lgas->map(fn($l) => ['id' => $l->id, 'name' => $l->name])
+  ]));
+  const wardsData = @json($states->flatMap(fn($s) => $s->zones)->flatMap(fn($z) => $z->lgas)->mapWithKeys(fn($l) => [
+    $l->id => $l->wards->map(fn($w) => ['id' => $w->id, 'name' => $w->name])
+  ]));
+
   const cvrModalEl = document.getElementById('cvr-modal');
   const cvrModal   = new bootstrap.Modal(cvrModalEl);
   let editingId    = null;
@@ -187,15 +196,12 @@ $(document).ready(function () {
     $('#password-hint').text('');
     hideAllLocationFields();
     clearErrors();
-
-    const focused = document.activeElement;
-    if (focused && cvrModalEl.contains(focused)) focused.blur();
-    $('#create-cvr-login').trigger('focus');
-
-    // Clear AJAX-populated selects
     $('#zone').html('<option value="">Select zone</option>');
     $('#lga').html('<option value="">Select LGA</option>');
     $('#ward').html('<option value="">Select Ward</option>');
+    const focused = document.activeElement;
+    if (focused && cvrModalEl.contains(focused)) focused.blur();
+    $('#create-cvr-login').trigger('focus');
   });
 
   // ── OPEN FOR CREATE ──────────────────────────────────────
@@ -233,40 +239,16 @@ $(document).ready(function () {
 
     toggleLocationFields(roleName);
 
-    // Admin cascades: state → zone → lga → ward all via AJAX
+    // Populate cascades from embedded data — no AJAX
     if (stateId) {
       $('#state').val(stateId);
-
-      $.get(`/admin/states/${stateId}`, function (data) {
-        let zOptions = '<option value="">Select zone</option>';
-        data.state.zones.forEach(z => {
-          const sel = z.id == zoneId ? 'selected' : '';
-          zOptions += `<option value="${z.id}" ${sel}>${z.name}</option>`;
-        });
-        $('#zone').html(zOptions);
-
-        if (zoneId) {
-          $.get(`/admin/zones/${zoneId}`, function (data) {
-            let lOptions = '<option value="">Select LGA</option>';
-            data.zone.lgas.forEach(l => {
-              const sel = l.id == lgaId ? 'selected' : '';
-              lOptions += `<option value="${l.id}" ${sel}>${l.name}</option>`;
-            });
-            $('#lga').html(lOptions);
-
-            if (lgaId) {
-              $.get(`/admin/lgas/${lgaId}`, function (data) {
-                let wOptions = '<option value="">Select Ward</option>';
-                data.lga.wards.forEach(w => {
-                  const sel = w.id == wardId ? 'selected' : '';
-                  wOptions += `<option value="${w.id}" ${sel}>${w.name}</option>`;
-                });
-                $('#ward').html(wOptions);
-              });
-            }
-          });
-        }
-      });
+      populateSelect('#zone', zonesData[stateId] || [], 'Select zone', zoneId);
+    }
+    if (zoneId) {
+      populateSelect('#lga', lgasData[zoneId] || [], 'Select LGA', lgaId);
+    }
+    if (lgaId) {
+      populateSelect('#ward', wardsData[lgaId] || [], 'Select Ward', wardId);
     }
 
     cvrModal.show();
@@ -285,67 +267,34 @@ $(document).ready(function () {
   function toggleLocationFields(roleName) {
     hideAllLocationFields();
     if (!roleName) return;
-
-    if (roleName === 'state_coordinator') {
-      $('#state-wrapper').removeClass('d-none');
-    }
-    if (roleName === 'zonal_coordinator') {
-      $('#state-wrapper, #zone-wrapper').removeClass('d-none');
-    }
-    if (roleName === 'lga_coordinator') {
-      $('#state-wrapper, #zone-wrapper, #lga-wrapper').removeClass('d-none');
-    }
-    if (roleName === 'ward_coordinator') {
-      $('#state-wrapper, #zone-wrapper, #lga-wrapper, #ward-wrapper').removeClass('d-none');
-    }
+    if (roleName === 'state_coordinator')  $('#state-wrapper').removeClass('d-none');
+    if (roleName === 'zonal_coordinator')  $('#state-wrapper, #zone-wrapper').removeClass('d-none');
+    if (roleName === 'lga_coordinator')    $('#state-wrapper, #zone-wrapper, #lga-wrapper').removeClass('d-none');
+    if (roleName === 'ward_coordinator')   $('#state-wrapper, #zone-wrapper, #lga-wrapper, #ward-wrapper').removeClass('d-none');
   }
 
   // ── STATE CHANGE ─────────────────────────────────────────
   $('#state').on('change', function () {
-    const stateId = $(this).val();
+    const id = $(this).val();
     $('#zone').html('<option value="">Select zone</option>');
     $('#lga').html('<option value="">Select LGA</option>');
     $('#ward').html('<option value="">Select Ward</option>');
-    if (!stateId) return;
-
-    $.get(`/admin/states/${stateId}`, function (data) {
-      let options = '<option value="">Select zone</option>';
-      data.state.zones.forEach(z => {
-        options += `<option value="${z.id}">${z.name}</option>`;
-      });
-      $('#zone').html(options);
-    });
+    if (id) populateSelect('#zone', zonesData[id] || [], 'Select zone');
   });
 
   // ── ZONE CHANGE ──────────────────────────────────────────
   $('#zone').on('change', function () {
-    const zoneId = $(this).val();
+    const id = $(this).val();
     $('#lga').html('<option value="">Select LGA</option>');
     $('#ward').html('<option value="">Select Ward</option>');
-    if (!zoneId) return;
-
-    $.get(`/admin/zones/${zoneId}`, function (data) {
-      let options = '<option value="">Select LGA</option>';
-      data.zone.lgas.forEach(l => {
-        options += `<option value="${l.id}">${l.name}</option>`;
-      });
-      $('#lga').html(options);
-    });
+    if (id) populateSelect('#lga', lgasData[id] || [], 'Select LGA');
   });
 
   // ── LGA CHANGE ───────────────────────────────────────────
   $('#lga').on('change', function () {
-    const lgaId = $(this).val();
+    const id = $(this).val();
     $('#ward').html('<option value="">Select Ward</option>');
-    if (!lgaId) return;
-
-    $.get(`/admin/lgas/${lgaId}`, function (data) {
-      let options = '<option value="">Select Ward</option>';
-      data.lga.wards.forEach(w => {
-        options += `<option value="${w.id}">${w.name}</option>`;
-      });
-      $('#ward').html(options);
-    });
+    if (id) populateSelect('#ward', wardsData[id] || [], 'Select Ward');
   });
 
   // ── SUBMIT (create or update) ────────────────────────────
@@ -426,6 +375,15 @@ $(document).ready(function () {
   }
 
   // ── HELPERS ──────────────────────────────────────────────
+  function populateSelect(selector, items, label, selectedId = null) {
+    let options = `<option value="">${label}</option>`;
+    items.forEach(item => {
+      const selected = selectedId && item.id == selectedId ? 'selected' : '';
+      options += `<option value="${item.id}" ${selected}>${item.name}</option>`;
+    });
+    $(selector).html(options);
+  }
+
   function clearErrors() {
     $('.is-invalid').removeClass('is-invalid');
     $('.invalid-feedback').text('').hide();

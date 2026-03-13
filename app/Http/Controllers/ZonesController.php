@@ -33,9 +33,6 @@ class ZonesController extends Controller
         return view('admin.zones.index', [
             'zones' => $zones->paginate(10),
             'states' => State::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
             'sn' => 1,
         ]);
     }
@@ -81,66 +78,43 @@ class ZonesController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return view('admin.zones.create', [
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
-        ]);
-    }
-
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => ['required', 'min:3', Rule::unique('zones', 'name')],
-            'state_id' => ['required'],
-            'description' => ['required', 'min:24'],
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'state_id'    => 'required|exists:states,id',
+            'description' => 'nullable|string',
         ]);
 
-        Zone::create($data);
+        Zone::create($validated);
 
-        return redirect('/admin/zones')->with('success', 'Zone created successfully!');
+        return response()->json(['status' => true, 'message' => 'Zone created successfully.']);
     }
 
     public function show(Zone $zone)
     {
         return response()->json([
-            'zone' => $zone->load('lgas')
-        ]);
-    }
-
-    public function edit(Zone $zone)
-    {
-        return view('admin.zones.edit', [
-            'zone' => $zone,
-            'states' => State::latest()->get(),
-            'zones' => $zone->latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
+            'zone' => $zone->load('state')
         ]);
     }
 
     public function update(Request $request, Zone $zone)
     {
-        $data = $request->validate([
-            'name' => ['required', 'min:3'],
-            'state_id' => ['required'],
-            'description' => ['required', 'min:24'],
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'state_id'    => 'required|exists:states,id',
+            'description' => 'nullable|string',
         ]);
 
-        $zone->update($data);
+        $zone->update($validated);
 
-        return redirect('/admin/zones')->with('success', 'Zone updated successfully!');
+        return response()->json(['status' => true, 'message' => 'Zone updated successfully.']);
     }
 
     public function destroy(Zone $zone)
     {
         $zone->delete();
 
-        return redirect('/admin/zones')->with('success', 'Zone deleted successfully!');
+        return response()->json(['status' => true, 'message' => 'Zone deleted successfully.']);
     }
 }

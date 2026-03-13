@@ -18,107 +18,50 @@ class ElectionsController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(Election $election)
+    public function index()
     {
+        $elections = Election::latest()->paginate(20);
+
         return view('admin.elections.index', [
-            'elections' => $election->latest()->paginate(10),
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
+            'elections' => $elections,
+            'states' => State::with(['zones.lgas.wards.pus'])->latest()->get(),
             'sn' => 1,
         ]);
     }
 
     public function show(Election $election)
     {
-        return view('admin.elections.show', [
-            'election' => $election,
-            'states' => State::latest()->get(),
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
-        ]);
-    }
-
-    public function create()
-    {
-        $elections = [
-            'Presidential election',
-            'Governorship election',
-            'Senatorial election',
-            'House of Representatives election',
-            'House of Assemby election',
-            'Chairmanship',
-            'Councillor'
-        ];
-
-        return view('admin.elections.create', [
-            'election_list' => $elections,
-            'elections' => Election::latest()->get(),
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
-        ]);
+        return response()->json(['election' => $election]);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
             'type' => ['required', Rule::unique('elections', 'type')],
-            'date' => ['required'],
+            'date' => ['required', 'date'],
         ]);
 
         Election::create($data);
 
-        return redirect('/admin/elections')->with('success', 'Election created successfully!');
-    }
-
-    public function edit(Election $election)
-    {
-        $elections = [
-            'Presidential election',
-            'Governorship election',
-            'Senatorial election',
-            'House of Representatives election',
-            'House of Assemby election',
-            'Chairmanship',
-            'Councillor'
-        ];
-
-        return view('admin.elections.edit', [
-            'election' => $election,
-            'elections' => Election::latest()->get(),
-            'election_list' => $elections,
-            'states' => State::latest()->get(),
-            'zones' => Zone::latest()->get(),
-            'lgas' => Lga::latest()->get(),
-            'wards' => Ward::latest()->get(),
-            'pus' => Pu::latest()->get(),
-        ]);
+        return response()->json(['status' => true, 'message' => 'Election created successfully.']);
     }
 
     public function update(Request $request, Election $election)
     {
         $data = $request->validate([
-            'type' => ['required'],
-            'date' => ['required'],
+            'type' => ['required', Rule::unique('elections', 'type')->ignore($election->id)],
+            'date' => ['required', 'date'],
         ]);
 
         $election->update($data);
 
-        return redirect('/admin/elections')->with('success', 'Election updated successfully!');
+        return response()->json(['status' => true, 'message' => 'Election updated successfully.']);
     }
 
     public function destroy(Election $election)
     {
         $election->delete();
 
-        return redirect('/admin/elections')->with('success', 'Election deleted successfully!');
+        return response()->json(['status' => true, 'message' => 'Election deleted successfully.']);
     }
 }
