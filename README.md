@@ -1,1 +1,1 @@
-Election App
+Election Application
